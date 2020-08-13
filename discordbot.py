@@ -12,9 +12,6 @@ client = discord.Client()
 async def on_ready():
     print(f'{client.user} is connected to the following guild:')
     for guild in client.guilds:
-        # if guild.name == GUILD:
-        #     break
-
         print(f'{guild.name}(id: {guild.id})')
 
 def cms(message):

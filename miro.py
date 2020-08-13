@@ -34,20 +34,9 @@ def uploadWarmup(sheetPdf):
 
     driver.find_element_by_class_name("toolbar__item--upload").click()
 
-    # data-autotest-id="AT__upload--upload_via_url"
-
     driver.find_element_by_xpath("//*[@data-autotest-id='AT__upload--upload_via_url']").click()
 
-    # driver.find_element_by_xpath("//*[@data-autotest-id='modal-window__input']").setAttribute("value", "")
     driver.find_element_by_xpath("//*[@data-autotest-id='modal-window__input']").send_keys(imgUrl)
     driver.find_element_by_xpath("//*[@data-autotest-id='modal-window__submit-button']").click()
 
-    
-    # time.sleep(2)
-    # driver.find_element_by_id("active_users_layer").send_keys(Keys.PAGE_DOWN)
-    # Actions builder = new Actions(driver);
-    # builder.keyDown(Keys.PAGE_DOWN).perform()
-    # driver.find_element_by_xpath('//body').send_keys(Keys.PAGE_DOWN)
-
     return url
-    # 
