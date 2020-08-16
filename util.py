@@ -3,6 +3,7 @@ import requests
 import json
 import subprocess
 from cred import imgbbToken, exercisePdfPool
+import os
 
 def upload3(imgPath,name=""):
     with open(imgPath, "rb") as file:
@@ -19,3 +20,39 @@ def pdfToPng(pdfPath):
     imgPath=pdfPath.replace(".pdf","-1.png")
     subprocess.call(["pdftoppm", "-png",pdfPath,imgPath2])
     return imgPath
+
+def compileTex(texPath):
+    out_dir="."
+    process = subprocess.Popen(
+        args=[
+            f'latexmk',
+            f'-pdf',
+            f'-outdir={out_dir}',
+            f'-pdflatex=pdflatex -interaction=nonstopmode -shell-escape',
+            f'-cd', str(texPath)
+        ],
+        stdout=subprocess.DEVNULL,
+        stdin=subprocess.DEVNULL,
+        stderr=subprocess.STDOUT)
+    process.wait()
+    if process.returncode == 0:
+        print("Compiled")
+        return texPath[:-4]+".pdf"
+    else:
+        print("Error")
+        return None
+
+def dirOfFile(file):
+    return os.path.dirname(os.path.abspath(file))+"/"
+
+def compileTexIn(texPath,overviewPath):
+    texCode=open(texPath).read()
+    overview=open(overviewPath).read()
+    path=dirOfFile(texPath)
+    tmpPath=path+"TMP.tex"
+    file=open(tmpPath,"w")
+    file.write(overview.replace("<<<<files>>>>",texCode))
+    file.close()
+    pdf=compileTex(tmpPath)
+    os.unlink(tmpPath)
+    return pdf
