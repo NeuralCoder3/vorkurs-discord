@@ -3,19 +3,60 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 import time
 from util import upload3, pdfToPng
-from cred import boardUrl, profileDir,browser
+from cred import profileDir,browser
+from cred import miroUrl, miroOAuth
+import requests
 
 
-def uploadWarmup(sheetPdf):
-    imgPath=pdfToPng(sheetPdf)
-    imgUrl=upload3(imgPath)
+def createBoard(name):
+    url = "https://api.miro.com/v1/boards"
 
-    url=boardUrl
-    chrome_options = Options()
-    chrome_options.add_argument("--user-data-dir="+profileDir) 
-    chrome_options.add_argument('--profile-directory=Profile 1')
-    chrome_options.binary_location=(browser)
-    driver = webdriver.Chrome(options=chrome_options)
+    payload = "{\"name\":\""+name+"\",\"sharingPolicy\":{\"access\":\"view\",\"teamAccess\":\"edit\"}}"
+    headers = {
+        'content-type': "application/json",
+        'authorization': "Bearer "+miroOAuth
+        }
+
+    response = requests.request("POST", url, data=payload, headers=headers)
+
+    # print(response.text)
+    return print(response.json()["id"])
+
+
+def getUrl(boardId):
+    return miroUrl+boardId+"/"
+
+cache=dict()
+
+def addPdf(pdf,boardId):
+    global cache
+    if pdf in cache:
+        imgUrl=cache[pdf]
+    else:
+        imgPath=pdfToPng(pdf)
+        imgUrl=upload3(imgPath)
+        cache[pdf]=imgUrl
+    addImageUrl(imgUrl,boardId)
+
+def addImageUrl(imgUrl,boardId):
+    # chrome_options = Options()
+    # chrome_options.add_argument("--user-data-dir="+profileDir) 
+    # chrome_options.add_argument('--profile-directory=Profile 1')
+    # chrome_options.binary_location=(browser)
+    # driver = webdriver.Chrome(options=chrome_options)
+    url=getUrl(boardId)
+
+    options = Options()
+
+    # options.add_argument("--user-data-dir="+profileDir) 
+    # options.add_argument('--profile-directory=Profile 1')
+    # options.binary_location=(browser)
+
+    options.add_argument('headless')
+    driver = webdriver.Chrome(options=options)
+
+    # driver = webdriver.Chrome()
+
     driver.get(url)
 
     # to wait til done
@@ -30,13 +71,25 @@ def uploadWarmup(sheetPdf):
     #     print "Loading took too much time!"
     time.sleep(10)
 
-    print("Loaded")
+    # print("Insert")
+    # for brave
+    # driver.find_element_by_class_name("toolbar__item--upload").click()
 
-    driver.find_element_by_class_name("toolbar__item--upload").click()
+    # for chrome
+    driver.find_element_by_class_name("AT__toolbar--LIBRARY").click()
+    time.sleep(0.5)
+    driver.find_element_by_class_name("AT__library--UPLOAD").click()
+    time.sleep(0.5)
 
     driver.find_element_by_xpath("//*[@data-autotest-id='AT__upload--upload_via_url']").click()
 
     driver.find_element_by_xpath("//*[@data-autotest-id='modal-window__input']").send_keys(imgUrl)
     driver.find_element_by_xpath("//*[@data-autotest-id='modal-window__submit-button']").click()
 
-    return url
+    time.sleep(5)
+    driver.close()
+
+
+def uploadWarmup(sheetPdf,boardId):
+    addPdf(sheetPdf,boardId)
+    return getUrl(boardId)
