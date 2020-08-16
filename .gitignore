@@ -503,3 +503,6 @@ Url.txt
 *.pdf
 *.png
 *.txt
+*.pickle
+test.py
+T.tex
