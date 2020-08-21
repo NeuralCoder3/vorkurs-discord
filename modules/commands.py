@@ -9,11 +9,13 @@ try:
     from .cred import *
     from .miro import uploadWarmup
     from .markdown import markdownSheet, createFromFile
+    from .import database as db
 except ImportError:
     from util import *
     from cred import *
     from miro import uploadWarmup
     from markdown import markdownSheet, createFromFile
+    import database as db
 
 # https://leovoel.github.io/embed-visualizer/
 
@@ -46,23 +48,44 @@ def help(message,args):
 
 
 def replaceAlias(cmd,channelId):
+    cursor=db.conn.cursor()
+    q=list(cursor.execute("SELECT command FROM aliases WHERE alias=? AND channelID=?", (cmd,channelId)).fetchall())
+    db.conn.commit()
+    cursor.close()
+    if len(q)>0:
+        cmd=q[0][0]
     return cmd
 
+def addAlias(message,args):
+    if len(args)<2:
+        return message.channel.send(f"wrong syntax.")
+    channelId=message.channel.id
+    aliasName=args[0]
+    command=args[1]
 
-def loadAlias():
+    cursor=db.conn.cursor()
+    cursor.execute("""REPLACE INTO 
+    aliases(channelID,alias,command)
+    VALUES (?,?,?)""",(channelId,aliasName,command))
+    db.conn.commit()
+    cursor.close()
+    return message.channel.send(f"Alias {aliasName} for {command} was added in {message.channel}")
+        
+def listAlias(message,args):
     global alias
-    if os.path.exists('alias.pickle'):
-        with open('alias.pickle', 'rb') as f:
-            alias=pickle.load(f)
-            # print(alias)
+    channelId=message.channel.id
+
+    cursor=db.conn.cursor()
+    aliasList=list(cursor.execute("SELECT alias,command FROM aliases WHERE channelID=?", (channelId,)).fetchall())
+    db.conn.commit()
+    cursor.close()
+    if len(aliasList)>0:
+        aliases=""
+        for an,c in aliasList:
+            aliases+=f"{an} ↦ {c}\n"
+        return message.channel.send(aliases)
     else:
-        alias=dict()
-
-def saveAlias():
-    global alias
-    with open('alias.pickle', 'wb') as f:
-        pickle.dump(alias,f)
-        # pickle.HIGHEST_PROTOCOL
+        return message.channel.send("No aliases found.")
 
 
 channel2coaching=dict()
@@ -95,29 +118,6 @@ def ask(message,args):
         return message.channel.send(f"Follow this link {url}. You maybe have to change the category.")
     else:
         return message.channel.send(f"wrong syntax.")
-
-def addAlias(message,args):
-    if len(args)<2:
-        return message.channel.send(f"wrong syntax.")
-    global alias
-    channelId=message.channel.id
-    aliasName=args[0]
-    command=args[1]
-    if not channelId in alias:
-        alias[channelId]=dict()
-    alias[channelId][aliasName]=command
-    saveAlias()
-    return message.channel.send(f"Alias {aliasName} for {command} was added in {message.channel}")
-        
-def listAlias(message,args):
-    global alias
-    channelId=message.channel.id
-    aliasList=""
-    if not channelId in alias:
-        return message.channel.send("No aliases found.")
-    for an,c in alias[channelId].items():
-        aliasList+=f"{an} ↦ {c}\n"
-    return message.channel.send(aliasList)
 
 
 commands={

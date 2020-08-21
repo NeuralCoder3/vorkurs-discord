@@ -6,7 +6,7 @@ from modules.cred import *
 from modules.util import *
 from modules.miro import uploadWarmup
 from modules.markdown import markdownSheet
-from modules.commands import alias, loadAlias, commands, replaceAlias
+from modules.commands import commands, replaceAlias
 import modules.database as db
 
 client = discord.Client()
@@ -28,16 +28,10 @@ async def on_message(message):
         cmd=parts[0]
         args=parts[1:]
         cmd=replaceAlias(cmd,channelId)
-        if channelId in alias and cmd in alias[channelId]:
-            old_cmd=cmd
-            cmd=alias[channelId][cmd]
-            print("Found alias ",old_cmd,"=>",cmd)
         if cmd in commands:
             fun,_,_=commands[cmd]
             await fun(message,args)
 
 db.create_connection("data.db")
-loadAlias()
-from modules.commands import alias
 
 client.run(BotToken)

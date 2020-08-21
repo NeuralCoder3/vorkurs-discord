@@ -506,3 +506,4 @@ Url.txt
 *.pickle
 test.py
 T.tex
+*.db

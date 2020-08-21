@@ -10,8 +10,10 @@ def create_connection(db_file):
         conn = sqlite3.connect(db_file)
         conn.execute("""
 CREATE TABLE IF NOT EXISTS aliases (
-    alias TEXT NOT NULL PRIMARY KEY,
-    command TEXT NOT NULL
+    alias TEXT NOT NULL,
+    channelID TEXT NOT NULL,
+    command TEXT NOT NULL,
+    PRIMARY KEY (alias,channelID)
 );""")
         conn.commit()
         conn.execute("""
@@ -25,26 +27,21 @@ CREATE TABLE IF NOT EXISTS cache (
         print(e)
     return conn
 
-def createTables(conn):
+def lookupCache(file):
     cursor=conn.cursor()
-    cursor.execute("")
+    q=list(cursor.execute("SELECT url FROM cache WHERE file=?", (file,)).fetchall())
     conn.commit()
     cursor.close()
+    if len(q)>0:
+        return q[0][0]
+    else:
+        return None
 
 
-# def getField(table,field,condition):
-#     global conn
-#     conn.execute()
-#     conn.commit()
-#     pass
-
-# def writeField(table,field,value):
-#     cursor=conn.cursor()
-#     cursor.execute("REPLACE INTO ?(?)")
-#     conn.commit()
-#     cursor.close()
-#     #     REPLACE INTO table(column_list)
-#     # VALUES(value_list);
-#     pass
-
-# create_connection("data.db")
+def storeCache(ex,imgUrl):
+    cursor=conn.cursor()
+    cursor.execute("""REPLACE INTO 
+    cache(file,url,time)
+    VALUES (?,?,date('now'))""",(ex,imgUrl))
+    conn.commit()
+    cursor.close()

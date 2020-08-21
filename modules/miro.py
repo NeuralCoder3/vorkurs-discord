@@ -8,10 +8,12 @@ try:
     from .util import upload3, pdfToPng
     from .cred import profileDir,browser
     from .cred import miroUrl, miroOAuth
+    from .import database as db
 except ImportError:
     from util import upload3, pdfToPng
     from cred import profileDir,browser
     from cred import miroUrl, miroOAuth
+    import database as db
 
 
 def createBoard(name):
@@ -35,13 +37,13 @@ def getUrl(boardId):
 cache=dict()
 
 def addPdf(pdf,boardId):
-    global cache
-    if pdf in cache:
-        imgUrl=cache[pdf]
+    cached=db.lookupCache(pdf)
+    if cached is not None:
+        imgUrl=cached
     else:
         imgPath=pdfToPng(pdf)
         imgUrl=upload3(imgPath)
-        cache[pdf]=imgUrl
+        db.storeCache(pdf,imgUrl)
     addImageUrl(imgUrl,boardId)
 
 def addImageUrl(imgUrl,boardId):

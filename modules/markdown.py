@@ -5,9 +5,11 @@ import os
 try:
     from .util import upload3, pdfToPng, dirOfFile, compileTexIn
     from .cred import overviewPNG
+    from .import database as db
 except ImportError:
     from util import upload3, pdfToPng, dirOfFile, compileTexIn
     from cred import overviewPNG
+    import database as db
 
 
 def createFromFile(filePath):
@@ -15,10 +17,8 @@ def createFromFile(filePath):
     url=open("Url.txt").read().replace("Found. Redirecting to ","")+"?both"
     return url
 
-cache=dict()
 
 def markdownSheet(sheet):
-    global cache
     content=open(sheet).read()
     # exercises=[x.group(1).replace(".tex","_png.pdf") for x in re.finditer( r'input{.*?pool/(.*?)}', content)]
 
@@ -37,14 +37,15 @@ def markdownSheet(sheet):
     content=""
     for ex in exercises:
         # print(ex)
-        if ex in cache:
-            imgUrl=cache[ex]
+        cached=db.lookupCache(ex)
+        if cached is not None:
+            imgUrl=cached
         else:
             imgPathPDF=compileTexIn(ex,overviewPNG)
             imgPath=pdfToPng(imgPathPDF)
 
             imgUrl=upload3(imgPath,"")
-            cache[ex]=imgUrl
+            db.storeCache(ex,imgUrl)
             print(ex, "=>",imgUrl)
 
         exText=answer.replace("<<exerciseImage>>", f"![]({imgUrl})")
