@@ -1,16 +1,18 @@
 import os
 import discord
 
+
 from modules.cred import *
 # from modules.cred import *
 from modules.util import *
 from modules.miro import uploadWarmup
 from modules.markdown import markdownSheet
 from modules.commands import commands, replaceAlias
+import modules.commands as cmds
 import modules.database as db
 
-client = discord.Client()
 
+client = discord.Client()
 
 @client.event
 async def on_ready():

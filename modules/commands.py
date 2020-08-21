@@ -9,13 +9,15 @@ try:
     from .cred import *
     from .miro import uploadWarmup
     from .markdown import markdownSheet, createFromFile
-    from .import database as db
+    from . import database as db
+    from .reminder import remindme
 except ImportError:
     from util import *
     from cred import *
     from miro import uploadWarmup
     from markdown import markdownSheet, createFromFile
     import database as db
+    from reminder import remindme
 
 # https://leovoel.github.io/embed-visualizer/
 
@@ -119,6 +121,22 @@ def ask(message,args):
     else:
         return message.channel.send(f"wrong syntax.")
 
+async def reminder(message,args,here):
+    if len(args)<1:
+        await message.channel.send(f"wrong syntax.")
+        return
+    time=args[0]
+    if len(args)>=2:
+        msg=args[1]
+    else:
+        msg="Erinnerung!"
+    await remindme(message,time,msg,here=here)
+
+async def remindUs(message,args):
+    await reminder(message,args,True)
+
+async def remindMe(message,args):
+    await reminder(message,args,False)
 
 commands={
     "links": (links,"Prints a list of useful links",True),
@@ -128,7 +146,10 @@ commands={
     "help": (help,"Shows this help",True),
     "ask": (ask,"Asks the questions on the forum. Format /ask Title Text: Question",True),
     "alias": (addAlias,"Adds an alias. Syntax: /alias newAlias cmd",True),
+    "remindMe": (remindMe,"Sends a reminder after a specified time to you the user. Syntax: /remindMe time [message]",True),
+    "remindUs": (remindUs,"Sends a reminder after a specified time to this channel. Syntax: /remindMe time [message]",True),
     "listAlias": (listAlias,"Lists all aliases in the channel",True),
 }
 
 alias=dict()
+
