@@ -2,10 +2,16 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 import time
-from util import upload3, pdfToPng
-from cred import profileDir,browser
-from cred import miroUrl, miroOAuth
 import requests
+
+try:
+    from .util import upload3, pdfToPng
+    from .cred import profileDir,browser
+    from .cred import miroUrl, miroOAuth
+except ImportError:
+    from util import upload3, pdfToPng
+    from cred import profileDir,browser
+    from cred import miroUrl, miroOAuth
 
 
 def createBoard(name):

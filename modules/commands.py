@@ -1,12 +1,21 @@
-from cred import *
 import discord
-from miro import uploadWarmup
-from markdown import markdownSheet, createFromFile
 import datetime
 from urllib.parse import quote_plus
-from util import *
 import pickle
 import os
+
+try:
+    from .util import *
+    from .cred import *
+    from .miro import uploadWarmup
+    from .markdown import markdownSheet, createFromFile
+except ImportError:
+    from util import *
+    from cred import *
+    from miro import uploadWarmup
+    from markdown import markdownSheet, createFromFile
+
+# https://leovoel.github.io/embed-visualizer/
 
 def links(message,args):
     embed = discord.Embed(title="Link-List", colour=discord.Colour(0x4a90e2), url="https://discordapp.com", description="Click the hyperreference for the concrete website.", timestamp=datetime.datetime.utcfromtimestamp(1597566031))
@@ -35,6 +44,9 @@ def help(message,args):
     return message.channel.send(embed=embedVar)
 
 
+
+def replaceAlias(cmd,channelId):
+    return cmd
 
 
 def loadAlias():
@@ -94,7 +106,6 @@ def addAlias(message,args):
     if not channelId in alias:
         alias[channelId]=dict()
     alias[channelId][aliasName]=command
-    # alias[(channelId,aliasName)]=command
     saveAlias()
     return message.channel.send(f"Alias {aliasName} for {command} was added in {message.channel}")
         
@@ -106,30 +117,9 @@ def listAlias(message,args):
         return message.channel.send("No aliases found.")
     for an,c in alias[channelId].items():
         aliasList+=f"{an} ↦ {c}\n"
-    # for k,c in alias.items():
-    #     ci,an = k
-    #     if ci==channelId:
-    #         aliasList+=f"{an} ↦ {c}\n"
     return message.channel.send(aliasList)
 
 
-# @ bot.command()
-async def createCoach(message,args):
-    if len(args)<1:
-        await message.channel.send("wrong syntax")
-        return
-    name=args[0] # Coaching #1
-    role=await message.guild.create_role(name=name)
-    overwrites = {
-        message.guild.default_role: discord.PermissionOverwrite(read_messages=False),
-        role: discord.PermissionOverwrite(read_messages=True)
-    }
-
-    cat=await message.guild.create_category(name, overwrites=overwrites)
-    await message.guild.create_text_channel(name,category=cat, overwrites=overwrites)
-    await message.guild.create_voice_channel(name,category=cat, overwrites=overwrites)
-
-        
 commands={
     "links": (links,"Prints a list of useful links",True),
     "warmup": (warmUpWhiteboard,"Creates a whiteboard with the current warm-up sheet",True),
@@ -139,8 +129,6 @@ commands={
     "ask": (ask,"Asks the questions on the forum. Format /ask Title Text: Question",True),
     "alias": (addAlias,"Adds an alias. Syntax: /alias newAlias cmd",True),
     "listAlias": (listAlias,"Lists all aliases in the channel",True),
-
-    "createCoaching": (createCoach,"",False),
 }
 
 alias=dict()

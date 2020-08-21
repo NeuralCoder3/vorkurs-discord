@@ -1,8 +1,14 @@
 import re
 import subprocess
 import os
-from util import upload3, pdfToPng, dirOfFile, compileTexIn
-from cred import overviewPNG
+
+try:
+    from .util import upload3, pdfToPng, dirOfFile, compileTexIn
+    from .cred import overviewPNG
+except ImportError:
+    from util import upload3, pdfToPng, dirOfFile, compileTexIn
+    from cred import overviewPNG
+
 
 def createFromFile(filePath):
     os.system("curl -v -XPOST -H 'Content-Type: text/markdown' 'https://demo.codimd.org/new' --data-binary @"+filePath+" > Url.txt")

@@ -1,14 +1,16 @@
 import os
 import discord
-from miro import uploadWarmup
-from markdown import markdownSheet
-from cred import *
-from commands import alias, loadAlias, commands
-from util import *
+
+from modules.cred import *
+# from modules.cred import *
+from modules.util import *
+from modules.miro import uploadWarmup
+from modules.markdown import markdownSheet
+from modules.commands import alias, loadAlias, commands, replaceAlias
+import modules.database as db
 
 client = discord.Client()
 
-# https://leovoel.github.io/embed-visualizer/
 
 @client.event
 async def on_ready():
@@ -25,6 +27,7 @@ async def on_message(message):
         parts=message_text[1:].split(" ")
         cmd=parts[0]
         args=parts[1:]
+        cmd=replaceAlias(cmd,channelId)
         if channelId in alias and cmd in alias[channelId]:
             old_cmd=cmd
             cmd=alias[channelId][cmd]
@@ -33,7 +36,8 @@ async def on_message(message):
             fun,_,_=commands[cmd]
             await fun(message,args)
 
+db.create_connection("data.db")
 loadAlias()
-from commands import alias
+from modules.commands import alias
 
 client.run(BotToken)

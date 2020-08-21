@@ -2,8 +2,12 @@ import base64
 import requests
 import json
 import subprocess
-from cred import imgbbToken, exercisePdfPool
 import os
+
+try:
+    from .cred import imgbbToken, exercisePdfPool
+except ImportError:
+    from cred import imgbbToken, exercisePdfPool
 
 def upload3(imgPath,name=""):
     with open(imgPath, "rb") as file:
