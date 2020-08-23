@@ -172,6 +172,19 @@ def scheduleWarmupMd(message,args):
     sched.addTask(channelId,hour,min,"warmupmd")
     return message.channel.send(f"Subscription successful")
 
+def scheduleDebug(message,args):
+    parts=args[0].split(":")
+    hour=int(parts[0])
+    min=int(parts[1])
+    channelId=message.channel.id
+    sched.addTask(channelId,hour,min,"warmupmd")
+    return message.channel.send(f"Subscription successful")
+
+def unsubscribe(message,args):
+    channelId=message.channel.id
+    sched.removeAll(channelId)
+    return message.channel.send(f"All subscriptions removed.")
+
 
 commands={
     "links": (links,"Prints a list of useful links",True),
@@ -186,6 +199,8 @@ commands={
     "listAlias": (listAlias,"Lists all aliases in the channel",True),
     "subscribeWarmup": (scheduleWarmup,"Subscribe to daily warmup sheets.",True),
     "subscribeWarmupMarkdown": (scheduleWarmup,"Subscribe to daily markdown warmup sheets.",True),
+    "subscribe": (scheduleDebug,"Subscribe debugging",True),
+    "unsubscribe": (unsubscribe,"Removes all subscriptions.",True),
 }
 
 alias=dict()

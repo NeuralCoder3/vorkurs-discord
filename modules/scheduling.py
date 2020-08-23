@@ -77,3 +77,10 @@ def markDone(q):
         WHERE channelId=? AND sched=? AND task=?""",gr)
         db.conn.commit()
         cursor.close()
+
+def removeAll(channelId):
+    cursor=db.conn.cursor()
+    cursor.execute("""DELETE FROM subscription
+    WHERE channelId=?""",(channelId,))
+    db.conn.commit()
+    cursor.close()
