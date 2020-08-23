@@ -11,6 +11,7 @@ try:
     from .markdown import markdownSheet, createFromFile
     from . import database as db
     from .reminder import remindme
+    from . import scheduling as sched
 except ImportError:
     from util import *
     from cred import *
@@ -18,6 +19,7 @@ except ImportError:
     from markdown import markdownSheet, createFromFile
     import database as db
     from reminder import remindme
+    import scheduling as sched
 
 # https://leovoel.github.io/embed-visualizer/
 
@@ -93,18 +95,26 @@ def listAlias(message,args):
 channel2coaching=dict()
 coaching2board=dict()
 
-def warmUpWhiteboard(message,args):
+async def createWarmupWhiteboard(channel):
     # url = uploadWarmup(testSheet1PDF,XXX)
     pdf=compileTex(testSheet1Tex)
     url = uploadWarmup(pdf,'o9J_knFi-8g=')
     # url = "TODO"
     print(f"Uploaded to {url}")
-    return message.channel.send(f"Here is your warmup {url}")
+    await channel.send(f"Here is your warmup {url}")
 
-def warmUpMarkdown(message,args):
+async def createWarmupMarkdown(channel):
     url = markdownSheet(testSheet1Tex)
     print(f"Uploaded Markdown to {url}")
-    return message.channel.send(f"Here is your markdown warmup {url}")
+    await channel.send(f"Here is your markdown warmup {url}")
+
+async def warmUpWhiteboard(message,args):
+    await message.channel.send("Creating whiteboard.")
+    await createWarmupWhiteboard(message.channel)
+
+async def warmUpMarkdown(message,args):
+    await message.channel.send("Creating markdown sheet.")
+    await createWarmupMarkdown(message.channel)
 
 def templateMarkdown(message,args):
     url=createFromFile("markdownHeader.md")
@@ -138,6 +148,31 @@ async def remindUs(message,args):
 async def remindMe(message,args):
     await reminder(message,args,False)
 
+def scheduleWarmup(message,args):
+    # if len(args)<1:
+    hour=9
+    min=30
+    # else: # remove this
+    #     parts=args[0].split(":")
+    #     hour=int(parts[0])
+    #     min=int(parts[1])
+    channelId=message.channel.id
+    sched.addTask(channelId,hour,min,"warmup")
+    return message.channel.send(f"Subscription successful")
+
+def scheduleWarmupMd(message,args):
+    # if len(args)<1:
+    hour=9
+    min=30
+    # else: # remove this
+    #     parts=args[0].split(":")
+    #     hour=int(parts[0])
+    #     min=int(parts[1])
+    channelId=message.channel.id
+    sched.addTask(channelId,hour,min,"warmupmd")
+    return message.channel.send(f"Subscription successful")
+
+
 commands={
     "links": (links,"Prints a list of useful links",True),
     "warmup": (warmUpWhiteboard,"Creates a whiteboard with the current warm-up sheet",True),
@@ -149,6 +184,8 @@ commands={
     "remindMe": (remindMe,"Sends a reminder after a specified time to you the user. Syntax: /remindMe time [message]",True),
     "remindUs": (remindUs,"Sends a reminder after a specified time to this channel. Syntax: /remindMe time [message]",True),
     "listAlias": (listAlias,"Lists all aliases in the channel",True),
+    "subscribeWarmup": (scheduleWarmup,"Subscribe to daily warmup sheets.",True),
+    "subscribeWarmupMarkdown": (scheduleWarmup,"Subscribe to daily markdown warmup sheets.",True),
 }
 
 alias=dict()

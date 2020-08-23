@@ -23,6 +23,15 @@ CREATE TABLE IF NOT EXISTS cache (
     time DATETIME
 );""")
         conn.commit()
+        conn.execute("""
+CREATE TABLE IF NOT EXISTS subscription (
+    channelId TEXT NOT NULL,
+    sched TEXT,
+    executed DATETIME,
+    task TEXT,
+    PRIMARY KEY (channelId, sched,task)
+);""")
+        conn.commit()
     except Error as e:
         print(e)
     return conn
