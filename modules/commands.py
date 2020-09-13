@@ -24,25 +24,19 @@ except ImportError:
     from reminder import remindme
     import scheduling as sched
 
+class CommandGroup():
 
-class CommandGroups(Enum):
-    discord = auto()
-    social = auto()
-    warmup = auto()
+    def __init__(self,title="",key=None,hidden=False,color=0xadd8e6):
+        self.key=key
+        self.title=title
+        self.hidden=hidden
+        self.color=color
 
-    hidden = auto()
-    socialadmin = auto()
-
-keys={
-    CommandGroups.socialadmin: socialkey,
-    CommandGroups.hidden : ""
-}
-
-groupColors={
-    # CommandGroups.discord: 0xadd8e6,
-    CommandGroups.social: 0xf9ffaf,
-    CommandGroups.warmup: 0xb7ffb2
-}
+discordGroup=CommandGroup(title="Discord")
+socialGroup=CommandGroup(title="PubQuiz",hidden=True,color=0xf9ffaf)
+warmupGroup=CommandGroup(title="SLP",color=0xb7ffb2)
+hiddenGroup=CommandGroup(hidden=True)
+socialadminGroup=CommandGroup(hidden=True,key=socialkey)
 
 # https://leovoel.github.io/embed-visualizer/
 
@@ -66,19 +60,21 @@ def links(message,args):
 async def help(message,args):
     global commands
 
-    for i,g in enumerate(CommandGroups):
-        embedVar = discord.Embed(title="Commands" if i==0 else "", description="", color=groupColors.get(g,0xadd8e6))
-        count=0
-        for cmd in commands.keys():
-            _,h,group=commands[cmd]
-            if group!=g:
-                continue
-            key=keys.get(group,None)
-            if key is None:
-                embedVar.add_field(name="/"+cmd, value=h, inline=False)
-                count+=1
-        if count>0:
-            await message.channel.send(embed=embedVar)
+    commandGroups=dict()
+    for cmd in commands.keys():
+        _,h,group=commands[cmd]
+        if group.hidden:
+            continue
+        if group not in commandGroups:
+            commandGroups[group]=[]
+        commandGroups[group].append((cmd,h))
+    for group,xs in commandGroups.items():
+        if group.hidden:
+            continue
+        embedVar = discord.Embed(title=f"{group.title} Commands", description="", color=group.color)
+        for cmd,h in xs:
+            embedVar.add_field(name="/"+cmd, value=h, inline=False)
+        await message.channel.send(embed=embedVar)
 
 def replaceAlias(cmd,channelId):
     cursor=db.conn.cursor()
@@ -216,23 +212,23 @@ def unsubscribe(message,args):
 
 
 commands={
-    "links": (links,"Prints a list of useful links",CommandGroups.warmup),
-    "warmup": (warmUpWhiteboard,"Creates a whiteboard with the current warm-up sheet",CommandGroups.warmup),
-    "warmupMarkdown": (warmUpMarkdown,"Creates a markdown document with the current warm-up sheet",CommandGroups.warmup),
-    "templateMarkdown": (templateMarkdown,"Creates a markdown document with some predefined aliases",CommandGroups.warmup),
-    "help": (help,"Shows this help",CommandGroups.discord),
-    "ask": (ask,"Asks the questions on the forum. Format /ask Title Text: Question",CommandGroups.warmup),
-    "alias": (addAlias,"Adds an alias. Syntax: /alias newAlias cmd",CommandGroups.discord),
-    "remindMe": (remindMe,"Sends a reminder after a specified time to you the user. Syntax: /remindMe time [message]",CommandGroups.discord),
-    "remindUs": (remindUs,"Sends a reminder after a specified time to this channel. Syntax: /remindMe time [message]",CommandGroups.discord),
-    "listAlias": (listAlias,"Lists all aliases in the channel",CommandGroups.discord),
-    "subscribeWarmup": (scheduleWarmup,"Subscribe to daily warmup sheets.",CommandGroups.warmup),
-    "subscribeWarmupMarkdown": (scheduleWarmup,"Subscribe to daily markdown warmup sheets.",CommandGroups.warmup),
-    "subscribe": (scheduleDebug,"Subscribe debugging",CommandGroups.hidden),
-    "unsubscribe": (unsubscribe,"Removes all subscriptions.",CommandGroups.warmup),
-    "nextGame": (nextGame,"Start next guessing game. syntax: nextGame key name",CommandGroups.socialadmin),
-    "showGame": (showGame,"Shows the answers. syntax: showGame key [name]",CommandGroups.socialadmin),
-    "guess": (guess,"Give a guess for the current game. syntax: guess answer",CommandGroups.social),
+    "links": (links,"Prints a list of useful links",warmupGroup),
+    "warmup": (warmUpWhiteboard,"Creates a whiteboard with the current warm-up sheet",warmupGroup),
+    "warmupMarkdown": (warmUpMarkdown,"Creates a markdown document with the current warm-up sheet",warmupGroup),
+    "templateMarkdown": (templateMarkdown,"Creates a markdown document with some predefined aliases",warmupGroup),
+    "help": (help,"Shows this help",discordGroup),
+    "ask": (ask,"Asks the questions on the forum. Format /ask Title Text: Question",warmupGroup),
+    "alias": (addAlias,"Adds an alias. Syntax: /alias newAlias cmd",discordGroup),
+    "remindMe": (remindMe,"Sends a reminder after a specified time to you the user. Syntax: /remindMe time [message]",discordGroup),
+    "remindUs": (remindUs,"Sends a reminder after a specified time to this channel. Syntax: /remindMe time [message]",discordGroup),
+    "listAlias": (listAlias,"Lists all aliases in the channel",discordGroup),
+    "subscribeWarmup": (scheduleWarmup,"Subscribe to daily warmup sheets.",warmupGroup),
+    "subscribeWarmupMarkdown": (scheduleWarmup,"Subscribe to daily markdown warmup sheets.",warmupGroup),
+    "subscribe": (scheduleDebug,"Subscribe debugging",hiddenGroup),
+    "unsubscribe": (unsubscribe,"Removes all subscriptions.",warmupGroup),
+    "nextGame": (nextGame,"Start next guessing game. syntax: nextGame key name",socialadminGroup),
+    "showGame": (showGame,"Shows the answers. syntax: showGame key [name]",socialadminGroup),
+    "guess": (guess,"Give a guess for the current game. syntax: guess answer",socialGroup),
 }
 
 alias=dict()
