@@ -18,7 +18,7 @@ def createFromFile(filePath):
     return url
 
 
-def markdownSheet(sheet):
+def markdownSheet(sheet,number):
     content=open(sheet).read()
     # exercises=[x.group(1).replace(".tex","_png.pdf") for x in re.finditer( r'input{.*?pool/(.*?)}', content)]
 
@@ -33,6 +33,7 @@ def markdownSheet(sheet):
     
     header=open("markdownHeader.md").read()
     template=template.replace("<<header>>",header)
+    template=template.replace("<<number>>",number)
 
     content=""
     for ex in exercises:

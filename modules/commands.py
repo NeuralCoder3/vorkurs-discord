@@ -4,6 +4,8 @@ from urllib.parse import quote_plus
 import pickle
 import os
 from enum import Enum, auto
+import git 
+import datetime
 
 try:
     from .util import *
@@ -25,7 +27,6 @@ except ImportError:
     import scheduling as sched
 
 class CommandGroup():
-
     def __init__(self,title="",key=None,hidden=False,color=0xadd8e6):
         self.key=key
         self.title=title
@@ -38,7 +39,16 @@ warmupGroup=CommandGroup(title="SLP",color=0xb7ffb2)
 hiddenGroup=CommandGroup(hidden=True)
 socialadminGroup=CommandGroup(hidden=True,key=socialkey)
 
-# https://leovoel.github.io/embed-visualizer/
+g = git.cmd.Git(gitRepo)
+dt = datetime.datetime.today()
+
+datemap=[
+    "A1","A2","A3","A4","A5","","",
+    "B1","B2","B3","B4","B5","","",
+    "C1","C2","C3","C4","C5","","",
+    "D1","D2","D3","D4","D5","",""
+]
+
 
 def links(message,args):
     embed = discord.Embed(title="Link-List", colour=discord.Colour(0x4a90e2), url="https://discordapp.com", description="Click the hyperreference for the concrete website.", timestamp=datetime.datetime.utcfromtimestamp(1597566031))
@@ -101,7 +111,6 @@ def addAlias(message,args):
     return message.channel.send(f"Alias {aliasName} for {command} was added in {message.channel}")
         
 def listAlias(message,args):
-    global alias
     channelId=message.channel.id
 
     cursor=db.conn.cursor()
@@ -116,20 +125,31 @@ def listAlias(message,args):
     else:
         return message.channel.send("No aliases found.")
 
-
-channel2coaching=dict()
-coaching2board=dict()
+def getCurrentTex():
+    g.pull()
+    idx=(dt.day+2)%30
+    number=datemap[idx]
+    sheetFile=sheetTex.replace(sheetPlaceholder,number)
+    return sheetFile, number
 
 async def createWarmupWhiteboard(channel):
     # url = uploadWarmup(testSheet1PDF,XXX)
-    pdf=compileTex(testSheet1Tex)
+    sheetFile,number=getCurrentTex()
+    if number=="":
+        print("It is a weekend")
+        return
+    pdf=compileTex(sheetFile)
     url = uploadWarmup(pdf,'o9J_knFi-8g=')
     # url = "TODO"
     print(f"Uploaded to {url}")
     await channel.send(f"Here is your warmup {url}")
 
 async def createWarmupMarkdown(channel):
-    url = markdownSheet(testSheet1Tex)
+    sheetFile,number=getCurrentTex()
+    if number=="":
+        print("It is a weekend")
+        return
+    url = markdownSheet(sheetFile,number)
     print(f"Uploaded Markdown to {url}")
     await channel.send(f"Here is your markdown warmup {url}")
 
@@ -231,5 +251,4 @@ commands={
     "guess": (guess,"Give a guess for the current game. syntax: guess answer",socialGroup),
 }
 
-alias=dict()
 
