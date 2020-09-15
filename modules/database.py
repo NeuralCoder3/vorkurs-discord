@@ -1,6 +1,11 @@
 import sqlite3
 from sqlite3 import Error
 
+try:
+    from .cred import boardFile
+except ImportError:
+    from cred import boardFile
+
 conn=None
 
 def create_connection(db_file):
@@ -32,9 +37,56 @@ CREATE TABLE IF NOT EXISTS subscription (
     PRIMARY KEY (channelId, sched,task)
 );""")
         conn.commit()
+        # conn.execute("DROP TABLE claims;")
+        # conn.commit()
+        conn.execute("""
+CREATE TABLE IF NOT EXISTS claims (
+    boardUrl TEXT NOT NULL,
+    channelId TEXT DEFAULT NULL,
+    PRIMARY KEY (boardUrl),
+    UNIQUE(boardUrl,channelId)
+);""")
+        conn.commit()
+        tryInsertBoards()
     except Error as e:
         print(e)
     return conn
+
+def findBoardListFromId(channelId,cursor):
+    q=list(cursor.execute("SELECT boardUrl FROM claims WHERE channelId=?", (channelId,)).fetchall())
+    conn.commit()
+    return q
+
+def getBoardUrl(channelId):
+    cursor=conn.cursor()
+
+    q=findBoardListFromId(channelId,cursor)
+
+    if len(q)==0:
+        print("claim a new board")
+        cursor.execute("UPDATE claims SET channelId=? WHERE boardUrl in (SELECT boardUrl FROM claims WHERE channelId IS NULL LIMIT 1)", (channelId,))
+        conn.commit()
+        q=findBoardListFromId(channelId,cursor)
+
+    cursor.close()
+
+    if len(q)==0:
+        return "No board for you!"
+    else:
+        return q[0][0]
+
+
+def tryInsertBoards():
+    boards=open(boardFile).readlines()
+    boards=filter(lambda s: "http" in s, boards)
+
+    cursor=conn.cursor()
+    for boardUrl in boards:
+        boardUrl=boardUrl.strip()
+        cursor.execute("INSERT OR IGNORE INTO claims(boardUrl) VALUES(?)", (boardUrl,))
+        conn.commit()
+
+    cursor.close()
 
 def lookupCache(file):
     cursor=conn.cursor()

@@ -32,7 +32,8 @@ def createBoard(name):
 
 
 def getUrl(boardId):
-    return miroUrl+boardId+"/"
+    # return miroUrl+boardId+"/"
+    return boardId
 
 def addPdf(pdf,boardId):
     cached=db.lookupCache(pdf)

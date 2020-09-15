@@ -139,7 +139,8 @@ async def createWarmupWhiteboard(channel):
         print("It is a weekend")
         return
     pdf=compileTex(sheetFile)
-    url = uploadWarmup(pdf,'o9J_knFi-8g=')
+    boardUrl=db.getBoardUrl(channel.id)
+    url = uploadWarmup(pdf,boardUrl)
     # url = "TODO"
     print(f"Uploaded to {url}")
     await channel.send(f"Here is your warmup {url}")
@@ -230,25 +231,33 @@ def unsubscribe(message,args):
     sched.removeAll(channelId)
     return message.channel.send(f"All subscriptions removed.")
 
+def claimWhiteboard(message,args):
+    channelId=message.channel.id
+    boardUrl=db.getBoardUrl(channelId)
+    return message.channel.send(f"Your board is {boardUrl}.")
 
 commands={
-    "links": (links,"Prints a list of useful links",warmupGroup),
-    "warmup": (warmUpWhiteboard,"Creates a whiteboard with the current warm-up sheet",warmupGroup),
-    "warmupMarkdown": (warmUpMarkdown,"Creates a markdown document with the current warm-up sheet",warmupGroup),
-    "templateMarkdown": (templateMarkdown,"Creates a markdown document with some predefined aliases",warmupGroup),
     "help": (help,"Shows this help",discordGroup),
-    "ask": (ask,"Asks the questions on the forum. Format /ask Title Text: Question",warmupGroup),
     "alias": (addAlias,"Adds an alias. Syntax: /alias newAlias cmd",discordGroup),
     "remindMe": (remindMe,"Sends a reminder after a specified time to you the user. Syntax: /remindMe time [message]",discordGroup),
     "remindUs": (remindUs,"Sends a reminder after a specified time to this channel. Syntax: /remindMe time [message]",discordGroup),
     "listAlias": (listAlias,"Lists all aliases in the channel",discordGroup),
+
+    "ask": (ask,"Asks the questions on the forum. Format /ask Title Text: Question",warmupGroup),
     "subscribeWarmup": (scheduleWarmup,"Subscribe to daily warmup sheets.",warmupGroup),
     "subscribeWarmupMarkdown": (scheduleWarmup,"Subscribe to daily markdown warmup sheets.",warmupGroup),
-    "subscribe": (scheduleDebug,"Subscribe debugging",hiddenGroup),
     "unsubscribe": (unsubscribe,"Removes all subscriptions.",warmupGroup),
+    "links": (links,"Prints a list of useful links",warmupGroup),
+    "warmup": (warmUpWhiteboard,"Creates a whiteboard with the current warm-up sheet",warmupGroup),
+    "warmupMarkdown": (warmUpMarkdown,"Creates a markdown document with the current warm-up sheet",warmupGroup),
+    "templateMarkdown": (templateMarkdown,"Creates a markdown document with some predefined aliases",warmupGroup),
+
+    "guess": (guess,"Give a guess for the current game. syntax: guess answer",socialGroup),
     "nextGame": (nextGame,"Start next guessing game. syntax: nextGame key name",socialadminGroup),
     "showGame": (showGame,"Shows the answers. syntax: showGame key [name]",socialadminGroup),
-    "guess": (guess,"Give a guess for the current game. syntax: guess answer",socialGroup),
+
+    "subscribe": (scheduleDebug,"Subscribe debugging",hiddenGroup),
+    "claimBoard": (claimWhiteboard,"Claims a whiteboard for the channel",hiddenGroup),
 }
 
 

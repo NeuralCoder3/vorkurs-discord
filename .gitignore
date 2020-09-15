@@ -509,3 +509,4 @@ T.tex
 *.db
 modules/reminderBot.py
 discord
+!boards.txt
