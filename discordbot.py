@@ -3,6 +3,7 @@ import discord
 
 
 from modules.cred import *
+import modules.cred as cred
 # from modules.cred import *
 from modules.util import *
 from modules.miro import uploadWarmup
@@ -45,7 +46,12 @@ async def on_message(message):
                 args=args[1:]
             await fun(message,args)
 
-db.create_connection("data.db")
+database="/storage/data.db"
+if not os.path.exists(database):
+    print("use local database")
+    database="."+database
+
+db.create_connection(database)
 
 sched.client=client
 client.loop.create_task(sched.check_schedule())

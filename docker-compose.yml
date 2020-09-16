@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+  discordvorkurs:
+    image: discordvorkurs
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+          - ./storage:/storage:rw
+          # - ~/.ssh:/home/appuser/.ssh:ro

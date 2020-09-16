@@ -502,11 +502,12 @@ Url.txt
 
 *.pdf
 *.png
-*.txt
 *.pickle
 test.py
 T.tex
 *.db
 modules/reminderBot.py
 discord
-!boards.txt
+storage/material
+
+key

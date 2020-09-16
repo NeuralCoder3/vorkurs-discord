@@ -5,9 +5,9 @@ import subprocess
 import os
 
 try:
-    from .cred import imgbbToken, exercisePdfPool
+    from .cred import imgbbToken
 except ImportError:
-    from cred import imgbbToken, exercisePdfPool
+    from cred import imgbbToken
 
 def upload3(imgPath,name=""):
     with open(imgPath, "rb") as file:
