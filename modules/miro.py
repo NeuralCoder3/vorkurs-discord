@@ -6,12 +6,12 @@ import requests
 
 try:
     from .util import upload3, pdfToPng
-    from .cred import profileDir,browser
+    # from .cred import profileDir,browser
     from .cred import miroUrl, miroOAuth
     from .import database as db
 except ImportError:
     from util import upload3, pdfToPng
-    from cred import profileDir,browser
+    # from cred import profileDir,browser
     from cred import miroUrl, miroOAuth
     import database as db
 
@@ -53,14 +53,26 @@ def addImageUrl(imgUrl,boardId):
     # driver = webdriver.Chrome(options=chrome_options)
     url=getUrl(boardId)
 
-    options = Options()
+    # options = Options()
 
-    # options.add_argument("--user-data-dir="+profileDir) 
-    # options.add_argument('--profile-directory=Profile 1')
-    # options.binary_location=(browser)
+    # # options.add_argument("--user-data-dir="+profileDir) 
+    # # options.add_argument('--profile-directory=Profile 1')
+    # # options.binary_location=(browser)
 
-    options.add_argument('headless')
-    driver = webdriver.Chrome(options=options)
+    # options.add_argument('headless')
+    # # options.add_argument('--headless')
+    # # options.add_argument("--no-sandbox")
+    # # options.add_argument("window-size=1400,2100") 
+    # # options.add_argument('--disable-gpu')
+    # driver = webdriver.Chrome(options=options)
+
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--window-size=1420,1080')
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--disable-gpu')
+    driver = webdriver.Chrome(chrome_options=chrome_options)
+
 
     # driver = webdriver.Chrome()
 

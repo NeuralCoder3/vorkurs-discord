@@ -3,8 +3,7 @@ import discord
 
 
 from modules.cred import *
-import modules.cred as cred
-# from modules.cred import *
+# import modules.cred as cred
 from modules.util import *
 from modules.miro import uploadWarmup
 from modules.markdown import markdownSheet
@@ -46,10 +45,7 @@ async def on_message(message):
                 args=args[1:]
             await fun(message,args)
 
-database="/storage/data.db"
-if not os.path.exists(database):
-    print("use local database")
-    database="."+database
+database=findPath("/storage/data.db")
 
 db.create_connection(database)
 
