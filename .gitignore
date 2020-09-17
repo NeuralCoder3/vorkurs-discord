@@ -495,7 +495,7 @@ dmypy.json
 # End of https://www.toptal.com/developers/gitignore/api/images,latex,python
 
 
-cred.py
+credPrivate.py
 old
 Temp.md
 Url.txt
@@ -510,4 +510,5 @@ modules/reminderBot.py
 discord
 storage/material
 
+boards.txt
 key
