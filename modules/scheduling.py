@@ -13,7 +13,6 @@ client=None
 
 async def check_schedule():
     await client.wait_until_ready()
-    # time.sleep(5)
     while True:
 
         tasks=checkTasks()
@@ -25,10 +24,6 @@ async def check_schedule():
                 await cmd.createWarmupMarkdown(channel)
             else:
                 await channel.send("Doing "+task)
-        # channelId=744652619506516198
-        # await client.get_channel(channelId).send("Doing stuff")
-        # print("Doing")
-
         await asyncio.sleep(5)
 
 def addTask(channel,hour,min,task):
@@ -54,17 +49,6 @@ def checkTasks():
 
     db.conn.commit()
     cursor.close()
-
-    # print("task")
-    # print(q)
-    # print("All tasks")
-
-    # cursor=db.conn.cursor()
-    # q2=list(cursor.execute("""SELECT * FROM subscription """).fetchall())
-    # db.conn.commit()
-    # cursor.close()
-
-    # print(q2)
 
     markDone(q)
     return q

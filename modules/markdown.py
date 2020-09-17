@@ -20,7 +20,6 @@ def createFromFile(filePath):
 
 def markdownSheet(sheet,number):
     content=open(sheet).read()
-    # exercises=[x.group(1).replace(".tex","_png.pdf") for x in re.finditer( r'input{.*?pool/(.*?)}', content)]
 
     content=content.replace("\squestion","\input{../pool/kennenlernen/self.tex}")
     content= re.sub(r'\\begin{secretquestions}(?s:.)*?\\end{secretquestions}', '', content)
@@ -37,7 +36,6 @@ def markdownSheet(sheet,number):
 
     content=""
     for ex in exercises:
-        # print(ex)
         cached=db.lookupCache(ex)
         if cached is not None:
             imgUrl=cached

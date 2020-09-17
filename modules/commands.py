@@ -138,7 +138,6 @@ def getCurrentTex():
     return sheetFile, number
 
 async def createWarmupWhiteboard(channel):
-    # url = uploadWarmup(testSheet1PDF,XXX)
     sheetFile,number=getCurrentTex()
     if number=="":
         print("It is a weekend")
@@ -146,7 +145,6 @@ async def createWarmupWhiteboard(channel):
     pdf=compileTex(sheetFile)
     boardUrl=db.getBoardUrl(channel.id)
     url = uploadWarmup(pdf,boardUrl)
-    # url = "TODO"
     print(f"Uploaded to {url}")
     await channel.send(f"Here is your warmup {url}")
 
@@ -200,25 +198,15 @@ async def remindMe(message,args):
     await reminder(message,args,False)
 
 def scheduleWarmup(message,args):
-    # if len(args)<1:
     hour=9
     min=30
-    # else: # remove this
-    #     parts=args[0].split(":")
-    #     hour=int(parts[0])
-    #     min=int(parts[1])
     channelId=message.channel.id
     sched.addTask(channelId,hour,min,"warmup")
     return message.channel.send(f"Subscription successful")
 
 def scheduleWarmupMd(message,args):
-    # if len(args)<1:
     hour=9
     min=30
-    # else: # remove this
-    #     parts=args[0].split(":")
-    #     hour=int(parts[0])
-    #     min=int(parts[1])
     channelId=message.channel.id
     sched.addTask(channelId,hour,min,"warmupmd")
     return message.channel.send(f"Subscription successful")

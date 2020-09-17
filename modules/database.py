@@ -37,8 +37,6 @@ CREATE TABLE IF NOT EXISTS subscription (
     PRIMARY KEY (channelId, sched,task)
 );""")
         conn.commit()
-        # conn.execute("DROP TABLE claims;")
-        # conn.commit()
         conn.execute("""
 CREATE TABLE IF NOT EXISTS claims (
     boardUrl TEXT NOT NULL,

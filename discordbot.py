@@ -3,7 +3,6 @@ import discord
 
 
 from modules.cred import *
-# import modules.cred as cred
 from modules.util import *
 from modules.miro import uploadWarmup
 from modules.markdown import markdownSheet
@@ -25,7 +24,6 @@ async def on_ready():
 @client.event
 async def on_message(message):
     channelId=message.channel.id
-    # print(channelId)
     message_text = message.content.strip()
     if message_text.startswith("/"):
         parts=message_text[1:].split(" ")
