@@ -1,31 +1,27 @@
 # Vorkurs Discordbot
 
+`discordbot.py` is the main script file for the bot.
+The data is stored in a sqlite3 database `data.db` in `./storage/`.
+The material git repository is needed in `./storage/material/`.
+Keys are placed in `./modules/credPrivate.py`.
 
-| File | Content |
-| ---- | --- |
-| discordbot.py | A bot to serve urls of warmup sheets |
-| miro.py | uploads a warmup sheet pdf to miro |
-| markdown.py | creates an online markdown document from a warmup tex file |
-| util.py | upload and conversion functions |
-| template.md | the general frame of markdown warum sheets |
-| answer.md | the template for each exercise and answer text |
-| cred.py | sensitive data |
+### Tools needed
 
-## Cred.py
+* python 3.8, 
+* texlive-full, 
+* access to the material repository, 
+* selenium chrome
 
-Fill in the fields in the style
-`field = "Text"`
+### Docker adaptation
 
-| Field | Content |
-| ---- | --- |
-| BotToken | a discord token of the bot |
-| imgbbToken | imgbb token to upload images |
-| exercisePdfPool | pre compiled pdf files for each exercise (cropped) |
-| browser | executable path to the browser for selenium |
-|  |  |
-| profileDir | profile for selenium to keep login |
-| boardUrl | url of the whiteboard to upload to |
-| testSheet1Tex | tex code for the warmup sheet |
-| testSheet1PDF | pdf file of the warmup sheet |
+To access the repository ssh keys are needed.
+They are placed in `./key/` as `id_ed25519` and `id_ed25519.pub` for the docker.
 
-The last four fields are temporary for testing and are not needed in the final bot.
+### Keys
+
+| Key | meaning |
+| --- | --- |
+| socialkey | key to access social team commands |
+| BotToken | token of the discord bot |
+| imgbbToken | imgBB token to upload images |
+| miroOAuth| authentification for new miro boards |
