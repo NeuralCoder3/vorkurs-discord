@@ -180,6 +180,14 @@ def ask(message,args):
     else:
         return message.channel.send(f"wrong syntax.")
 
+def feedback(message,args):
+    if len(args)<1:
+        return message.channel.send(f"wrong syntax.")
+    title=quote_plus("Bot Feedback")
+    text=quote_plus(" ".join(args))
+    url = f"https://vorkurs-discourse.cs.uni-saarland.de/new-message?username=Marcel.Ullrich&title={title}&body={text}&tags=discord"
+    return message.channel.send(f"Follow this link {url}. You maybe have to change the category.")
+
 async def reminder(message,args,here):
     if len(args)<1:
         await message.channel.send(f"wrong syntax.")
@@ -232,11 +240,12 @@ def claimWhiteboard(message,args):
 commands={
     "help": (help,"Shows this help",discordGroup),
     "alias": (addAlias,"Adds an alias. Syntax: /alias newAlias cmd",discordGroup),
-    "remindMe": (remindMe,"Sends a reminder after a specified time to you the user. Syntax: /remindMe time [message]",discordGroup),
-    "remindUs": (remindUs,"Sends a reminder after a specified time to this channel. Syntax: /remindMe time [message]",discordGroup),
+    "remindMe": (remindMe,"Sends a reminder after a specified time to you the user. Syntax: /remindMe time [message], example /remindMe 1m Hi",discordGroup),
+    "remindUs": (remindUs,"Sends a reminder after a specified time to this channel. Syntax: /remindUs time [message]",discordGroup),
     "listAlias": (listAlias,"Lists all aliases in the channel",discordGroup),
+    "feedback": (feedback,"Send feedback about the bot.",discordGroup),
 
-    "ask": (ask,"Asks the questions on the forum. Format /ask Title Text: Question",warmupGroup),
+    "ask": (ask,"Asks the questions on the forum. Format /ask 'Title Text': Question, example /ask Was ist das?: Was ist ein Apfel?",warmupGroup),
     "subscribeWarmup": (scheduleWarmup,"Subscribe to daily warmup sheets.",warmupGroup),
     "subscribeWarmupMarkdown": (scheduleWarmup,"Subscribe to daily markdown warmup sheets.",warmupGroup),
     "unsubscribe": (unsubscribe,"Removes all subscriptions.",warmupGroup),
