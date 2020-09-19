@@ -33,7 +33,7 @@ def addTask(channel,hour,min,task):
     cursor=db.conn.cursor()
     cursor.execute("""REPLACE INTO 
     subscription(channelId,sched,executed,task)
-    VALUES (?,?,datetime('00:00'),?)""",(channel,f"{hour:02d}:{min:02d}",task))
+    VALUES (?,?,datetime('now'),?)""",(channel,f"{hour:02d}:{min:02d}",task))
     db.conn.commit()
     cursor.close()
 
