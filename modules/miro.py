@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 import time
 import requests
 from random import randint
@@ -51,6 +52,10 @@ def addImageUrl(imgUrl,boardId):
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')
     driver = webdriver.Chrome(chrome_options=chrome_options)
+
+    # options = FirefoxOptions()
+    # options.headless = True
+    # driver = webdriver.Firefox(options=options) #, executable_path=r'C:\Utility\BrowserDrivers\geckodriver.exe')
 
     driver.get(url)
 
