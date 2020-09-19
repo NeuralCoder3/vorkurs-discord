@@ -1,5 +1,8 @@
 import os
-from credPrivate import *
+try:
+    from .credPrivate import *
+except ImportError:
+    from credPrivate import *
 
 def findPath(p):
     if not os.path.exists(p):
