@@ -40,19 +40,6 @@ hiddenGroup=CommandGroup(hidden=True)
 socialadminGroup=CommandGroup(hidden=True,key=socialkey)
 
 g = git.cmd.Git(gitRepo)
-dt = datetime.datetime.today()
-
-datemap=[
-    "A1","A2","A3","A4","A5","","",
-    "B1","B2","B3","B4","B5","","",
-    "C1","C2","C3","C4","C5","","",
-    "D1","D2","D3","D4","D5","","",
-    "","","","","",
-    "","","","","",
-    "","","","","",
-    "","","","","",
-    "","","","",""
-]
 
 
 def links(message,args):
@@ -67,7 +54,7 @@ def links(message,args):
     embed.add_field(name="General-Whiteboard", value="[miro.com](https://miro.com/app/board/o9J_knFi-8g=/)")
     embed.add_field(name="Markdown-Help", value="[demo.codimd.org](https://demo.codimd.org/VS-PheYmRYudteqkamusjg?both)")
     embed.add_field(name="Gather.Town", value="[gather.town](https://gather.town/MKvrIqJweh6s7lpZ/CS)")
-    embed.add_field(name="Games", value="TODO")
+    embed.add_field(name="Games", value="Ask")
 
     return message.channel.send(embed=embed)
 
@@ -93,7 +80,7 @@ async def help(message,args):
 
 def replaceAlias(cmd,channelId):
     cursor=db.conn.cursor()
-    q=list(cursor.execute("SELECT command FROM aliases WHERE alias=? AND channelID=?", (cmd,channelId)).fetchall())
+    q=list(cursor.execute("SELECT command FROM aliases WHERE alias=? AND (channelID=? OR channelID='default')", (cmd,channelId)).fetchall())
     db.conn.commit()
     cursor.close()
     if len(q)>0:
@@ -119,7 +106,7 @@ def listAlias(message,args):
     channelId=message.channel.id
 
     cursor=db.conn.cursor()
-    aliasList=list(cursor.execute("SELECT alias,command FROM aliases WHERE channelID=?", (channelId,)).fetchall())
+    aliasList=list(cursor.execute("SELECT alias,command FROM aliases WHERE channelID=? OR channelID='default'", (channelId,)).fetchall())
     db.conn.commit()
     cursor.close()
     if len(aliasList)>0:
@@ -130,17 +117,35 @@ def listAlias(message,args):
     else:
         return message.channel.send("No aliases found.")
 
-def getCurrentTex():
+async def getCurrentTex(channel, dayOverwrite=None):
     g.pull()
-    idx=(dt.day+2)%30
+    dt = datetime.datetime.today()
+    day=dt.day
+    if dayOverwrite is not None:
+        day=dayOverwrite
+    idx=(day+2)%30
     number=datemap[idx]
     sheetFile=sheetTex.replace(sheetPlaceholder,number)
+    if number=="":
+        print("Weekend")
+    wh,wm=warmupTime
+    # print(dt.hour,dt.minute)
+    if (dt.hour<wh) or (dt.hour == wh and dt.minute<wm):
+        print("too early for sheet "+number)
+        await channel.send(f"It is too early for the warmup sheet.")
+        number=""
     return sheetFile, number
 
+async def getSheetNumber(message,args):
+    day=None
+    if len(args)>0:
+        day=int(args[0])
+    _,num=await getCurrentTex(message.channel,day)
+    await message.channel.send(f"The current sheet is {num}")
+
 async def createWarmupWhiteboard(channel):
-    sheetFile,number=getCurrentTex()
+    sheetFile,number=await getCurrentTex(channel)
     if number=="":
-        print("It is a weekend")
         return
     pdf=compileTex(sheetFile)
     boardUrl=db.getBoardUrl(channel.id)
@@ -149,9 +154,8 @@ async def createWarmupWhiteboard(channel):
     await channel.send(f"Here is your warmup {url}")
 
 async def createWarmupMarkdown(channel):
-    sheetFile,number=getCurrentTex()
+    sheetFile,number=await getCurrentTex(channel)
     if number=="":
-        print("It is a weekend")
         return
     url = markdownSheet(sheetFile,number)
     print(f"Uploaded Markdown to {url}")
@@ -206,15 +210,13 @@ async def remindMe(message,args):
     await reminder(message,args,False)
 
 def scheduleWarmup(message,args):
-    hour=9
-    min=30
+    hour,min=scheduleTime
     channelId=message.channel.id
     sched.addTask(channelId,hour,min,"warmup")
     return message.channel.send(f"Subscription successful")
 
 def scheduleWarmupMd(message,args):
-    hour=9
-    min=30
+    hour,min=scheduleTime
     channelId=message.channel.id
     sched.addTask(channelId,hour,min,"warmupmd")
     return message.channel.send(f"Subscription successful")
@@ -258,8 +260,9 @@ commands={
     "nextGame": (nextGame,"Start next guessing game. syntax: nextGame key name",socialadminGroup),
     "showGame": (showGame,"Shows the answers. syntax: showGame key [name]",socialadminGroup),
 
-    "subscribe": (scheduleDebug,"Subscribe debugging",hiddenGroup),
+    "subscribeDebug": (scheduleDebug,"Subscribe debugging",hiddenGroup),
     "claimBoard": (claimWhiteboard,"Claims a whiteboard for the channel",hiddenGroup),
+    "whichSheet": (getSheetNumber,"Prints the number of the current warmup sheet.",hiddenGroup),
 }
 
 
