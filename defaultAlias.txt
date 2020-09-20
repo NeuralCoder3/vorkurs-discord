@@ -1,0 +1,4 @@
+warmupText warmupMarkdown
+subscribe subscribeWarmup
+subscribeText subscribeWarmupMarkdown
+subscribeWarmupText subscribeWarmupMarkdown

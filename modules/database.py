@@ -2,9 +2,9 @@ import sqlite3
 from sqlite3 import Error
 
 try:
-    from .cred import boardFile
+    from .cred import boardFile, aliasFile
 except ImportError:
-    from cred import boardFile
+    from cred import boardFile, aliasFile
 
 conn=None
 
@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS claims (
 );""")
         conn.commit()
         tryInsertBoards()
+        tryInsertAlias()
     except Error as e:
         print(e)
     return conn
@@ -73,6 +74,16 @@ def getBoardUrl(channelId):
     else:
         return q[0][0]
 
+def tryInsertAlias():
+    alias=open(aliasFile).readlines()
+    alias=map(lambda s: s.strip(),alias)
+    alias=filter(lambda s: s!="", alias)
+    alias=map(lambda s: s.split(" "),alias)
+    cursor=conn.cursor()
+    for new,org in alias:
+        cursor.execute("INSERT OR IGNORE INTO aliases(alias,channelID,command) VALUES(?,'default',?)", (new,org))
+        conn.commit()
+    cursor.close()
 
 def tryInsertBoards():
     boards=open(boardFile).readlines()
