@@ -42,6 +42,10 @@ async def on_message(message):
                     return
                 args=args[1:]
             await fun(message,args)
+        else:
+            nearest=cmds.findNearest(cmd)
+            await message.channel.send(f"invalid command, did you mean {nearest}")
+            
 
 database=findPath("/storage/data.db")
 

@@ -6,6 +6,7 @@ import os
 from enum import Enum, auto
 import git 
 import datetime
+import numpy as np
 
 try:
     from .util import *
@@ -58,18 +59,21 @@ def links(message,args):
 
     return message.channel.send(embed=embed)
 
-
-async def help(message,args):
-    global commands
-
+def listCommands(showAll=False):
     commandGroups=dict()
     for cmd in commands.keys():
         _,h,group=commands[cmd]
-        if group.hidden:
+        if group.hidden and not showAll:
             continue
         if group not in commandGroups:
             commandGroups[group]=[]
         commandGroups[group].append((cmd,h))
+    return commandGroups
+
+
+async def help(message,args):
+    global commands
+    commandGroups=listCommands(False)
     for group,xs in commandGroups.items():
         if group.hidden:
             continue
@@ -238,6 +242,32 @@ def claimWhiteboard(message,args):
     channelId=message.channel.id
     boardUrl=db.getBoardUrl(channelId)
     return message.channel.send(f"Your board is {boardUrl}.")
+
+def edit_distance(s, t):
+    prefix_matrix = np.zeros((len(s) + 1, len(t) + 1))
+    prefix_matrix[:, 0] = list(range(len(s) + 1))
+    prefix_matrix[0, :] = list(range(len(t) + 1))
+    for i in range(1, len(s) + 1):
+        for j in range(1, len(t) + 1):
+            insertion = prefix_matrix[i, j - 1] + 1
+            deletion = prefix_matrix[i - 1, j] + 1
+            match = prefix_matrix[i - 1, j - 1]
+            if s[i - 1] != t[j - 1]:
+                match += 1  # -- mismatch
+            prefix_matrix[i, j] = min(insertion, deletion, match)
+    return int(prefix_matrix[i, j])
+
+def findNearest(inputCmd):
+    commandGroups=listCommands(False)
+    p=[]
+    for group,xs in commandGroups.items():
+        if group.hidden:
+            continue
+        for cmd,_ in xs:
+            dist=edit_distance(inputCmd,cmd)
+            p.append((dist,cmd))
+    p.sort()
+    return p[0][1]
 
 commands={
     "help": (help,"Shows this help",discordGroup),
