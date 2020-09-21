@@ -279,7 +279,7 @@ commands={
 
     "ask": (ask,"Asks the questions on the forum. Format /ask 'Title Text': Question, example /ask Was ist das?: Was ist ein Apfel?",warmupGroup),
     "subscribeWarmup": (scheduleWarmup,"Subscribe to daily warmup sheets.",warmupGroup),
-    "subscribeWarmupMarkdown": (scheduleWarmup,"Subscribe to daily markdown warmup sheets.",warmupGroup),
+    "subscribeWarmupMarkdown": (scheduleWarmupMd,"Subscribe to daily markdown warmup sheets.",warmupGroup),
     "unsubscribe": (unsubscribe,"Removes all subscriptions.",warmupGroup),
     "links": (links,"Prints a list of useful links",warmupGroup),
     "warmup": (warmUpWhiteboard,"Creates a whiteboard with the current warm-up sheet",warmupGroup),
