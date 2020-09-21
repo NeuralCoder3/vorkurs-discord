@@ -285,6 +285,7 @@ commands={
     "warmup": (warmUpWhiteboard,"Creates a whiteboard with the current warm-up sheet",warmupGroup),
     "warmupMarkdown": (warmUpMarkdown,"Creates a markdown document with the current warm-up sheet",warmupGroup),
     "templateMarkdown": (templateMarkdown,"Creates a markdown document with some predefined aliases",warmupGroup),
+    "getBoard": (claimWhiteboard,"Retrieves the url of the whiteboard for this channel",warmupGroup),
 
     "guess": (guess,"Give a guess for the current game. syntax: guess answer",socialGroup),
     "nextGame": (nextGame,"Start next guessing game. syntax: nextGame key name",socialadminGroup),
