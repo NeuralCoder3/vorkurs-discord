@@ -2,7 +2,7 @@
 
 `discordbot.py` is the main script file for the bot.
 The data is stored in a sqlite3 database `data.db` in `./storage/`.
-The material git repository is needed in `./storage/material/`.
+The material git repository is needed in `./storage/materials/`.
 Keys are placed in `./modules/credPrivate.py`.
 
 ### Tools needed
