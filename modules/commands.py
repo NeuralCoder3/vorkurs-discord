@@ -55,7 +55,7 @@ def links(message,args):
     embed.add_field(name="General-Whiteboard", value="[miro.com](https://miro.com/app/board/o9J_knFi-8g=/)")
     embed.add_field(name="Markdown-Help", value="[demo.codimd.org](https://demo.codimd.org/VS-PheYmRYudteqkamusjg?both)")
     embed.add_field(name="Gather.Town", value="[gather.town](https://gather.town/MKvrIqJweh6s7lpZ/CS)")
-    embed.add_field(name="Games", value="Ask")
+    # embed.add_field(name="Games", value="Ask")
 
     return message.channel.send(embed=embed)
 
@@ -194,7 +194,7 @@ def feedback(message,args):
     title=quote_plus("Bot Feedback")
     text=quote_plus(" ".join(args))
     url = f"https://vorkurs-discourse.cs.uni-saarland.de/new-message?username=Marcel.Ullrich&title={title}&body={text}&tags=discord"
-    return message.channel.send(f"Follow this link {url}. You maybe have to change the category.")
+    return message.channel.send(f"Follow this link {url}")
 
 async def reminder(message,args,here):
     if len(args)<1:
@@ -202,7 +202,7 @@ async def reminder(message,args,here):
         return
     time=args[0]
     if len(args)>=2:
-        msg=args[1]
+        msg=" ".join(args[1:])
     else:
         msg="Erinnerung!"
     await remindme(message,time,msg,here=here)
