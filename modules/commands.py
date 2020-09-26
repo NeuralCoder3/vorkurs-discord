@@ -188,6 +188,13 @@ def ask(message,args):
     else:
         return message.channel.send(f"wrong syntax.")
 
+def askTitle(message,args):
+    title=" ".join(args)
+    title=quote_plus(title)
+    body=quote_plus("")
+    url = f"https://vorkurs-discourse.cs.uni-saarland.de/new-topic?title={title}&body={body}&category_id=16&tags=discord"
+    return message.channel.send(f"Follow this link {url}. You maybe have to change the category.")
+
 def feedback(message,args):
     if len(args)<1:
         return message.channel.send(f"wrong syntax.")
@@ -271,21 +278,21 @@ def findNearest(inputCmd):
 
 commands={
     "help": (help,"Shows this help",discordGroup),
-    "alias": (addAlias,"Adds an alias. Syntax: /alias newAlias cmd",discordGroup),
     "remindMe": (remindMe,"Sends a reminder after a specified time to you the user. Syntax: /remindMe time [message], example /remindMe 1m Hi",discordGroup),
     "remindUs": (remindUs,"Sends a reminder after a specified time to this channel. Syntax: /remindUs time [message]",discordGroup),
-    "listAlias": (listAlias,"Lists all aliases in the channel",discordGroup),
     "feedback": (feedback,"Send feedback about the bot.",discordGroup),
+    # "alias": (addAlias,"Adds an alias. Syntax: /alias newAlias cmd",discordGroup),
+    # "listAlias": (listAlias,"Lists all aliases in the channel",discordGroup),
 
-    "ask": (ask,"Asks the questions on the forum. Format /ask 'Title Text': Question, example /ask Was ist das?: Was ist ein Apfel?",warmupGroup),
+    # "ask": (ask,"Asks the questions on the forum. Format /ask 'Title Text': Question, example /ask Was ist das?: Was ist ein Apfel?",warmupGroup),
+    "ask": (askTitle,"Asks the questions on the forum. Format /ask Title",warmupGroup),
     "subscribeWarmup": (scheduleWarmup,"Subscribe to daily warmup sheets.",warmupGroup),
-    "subscribeWarmupMarkdown": (scheduleWarmupMd,"Subscribe to daily markdown warmup sheets.",warmupGroup),
+    # "subscribeWarmupMarkdown": (scheduleWarmupMd,"Subscribe to daily markdown warmup sheets.",warmupGroup),
     "unsubscribe": (unsubscribe,"Removes all subscriptions.",warmupGroup),
     "links": (links,"Prints a list of useful links",warmupGroup),
     "warmup": (warmUpWhiteboard,"Creates a whiteboard with the current warm-up sheet",warmupGroup),
-    "warmupMarkdown": (warmUpMarkdown,"Creates a markdown document with the current warm-up sheet",warmupGroup),
-    "templateMarkdown": (templateMarkdown,"Creates a markdown document with some predefined aliases",warmupGroup),
     "getBoard": (claimWhiteboard,"Retrieves the url of the whiteboard for this channel",warmupGroup),
+    "templateMarkdown": (templateMarkdown,"Creates a markdown document with some predefined aliases",warmupGroup),
 
     "guess": (guess,"Give a guess for the current game. syntax: guess answer",socialGroup),
     "nextGame": (nextGame,"Start next guessing game. syntax: nextGame key name",socialadminGroup),
@@ -294,6 +301,7 @@ commands={
     "subscribeDebug": (scheduleDebug,"Subscribe debugging",hiddenGroup),
     "claimBoard": (claimWhiteboard,"Claims a whiteboard for the channel",hiddenGroup),
     "whichSheet": (getSheetNumber,"Prints the number of the current warmup sheet.",hiddenGroup),
+    # "warmupMarkdown": (warmUpMarkdown,"Creates a markdown document with the current warm-up sheet",hiddenGroup),
 }
 
 
