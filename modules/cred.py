@@ -4,9 +4,12 @@ try:
 except ImportError:
     from credPrivate import *
 
-def findPath(p):
+def findPath(p,abs=False):
     if not os.path.exists(p):
-        p="."+p
+        if abs:
+            p=os.getcwd()+p
+        else:
+            p="."+p
         if not os.path.exists(p):
             print(f"We have a problem: {p} does not exists.")
     return p
@@ -22,18 +25,20 @@ miroUrl="https://miro.com/app/board/"
 database="data.db"
 boardFile="boards.txt"
 aliasFile="defaultAlias.txt"
-gitRepo=findPath("/storage/materials/")
-overviewPNG=gitRepo+"sheets/warmup/pool/overviewPNG.tex"
-sheetFolder="sheets/warmup/2020/"
-sheetPlaceholder="SHEET_ID"
-sheetTex=gitRepo+sheetFolder+f"warmup_{sheetPlaceholder}.tex"
+downDir=findPath("/storage/",True)
+# gitRepo=findPath("/storage/materials/")
+# overviewPNG=gitRepo+"sheets/warmup/pool/overviewPNG.tex"
+# sheetFolder="sheets/warmup/2020/"
+# sheetPlaceholder="SHEET_ID"
+# sheetTex=gitRepo+sheetFolder+f"warmup_{sheetPlaceholder}.tex"
 
 
 # Data
 
-warmupTime=(9,50)
-scheduleTime=(9,55)
+warmupTime=(10,1)
+scheduleTime=(10,1)
 
+# for weekends
 datemap=[
     "A1","A2","A3","A4","A5","","",
     "B1","B2","B3","B4","B5","","",

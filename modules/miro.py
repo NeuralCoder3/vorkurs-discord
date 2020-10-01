@@ -7,11 +7,11 @@ import requests
 from random import randint
 
 try:
-    from .util import upload3, pdfToPng
+    from .util import upload4, pdfToPng
     from .cred import miroUrl, miroOAuth
     from .import database as db
 except ImportError:
-    from util import upload3, pdfToPng
+    from util import upload4, pdfToPng
     from cred import miroUrl, miroOAuth
     import database as db
 
@@ -39,7 +39,7 @@ def addPdf(pdf,boardId):
         imgUrl=cached
     else:
         imgPath=pdfToPng(pdf)
-        imgUrl=upload3(imgPath)
+        imgUrl=upload4(imgPath)
         db.storeCache(pdf,imgUrl)
     addImageUrl(imgUrl,boardId)
 
@@ -80,7 +80,7 @@ def addImageUrl(imgUrl,boardId):
     driver.find_element_by_xpath("//*[@data-autotest-id='modal-window__input']").send_keys(imgUrl)
     driver.find_element_by_xpath("//*[@data-autotest-id='modal-window__submit-button']").click()
 
-    time.sleep(5)
+    time.sleep(15)
     driver.close()
 
 

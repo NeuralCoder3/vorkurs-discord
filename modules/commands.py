@@ -7,6 +7,7 @@ from enum import Enum, auto
 import git 
 import datetime
 import numpy as np
+import threading
 
 try:
     from .util import *
@@ -40,7 +41,7 @@ warmupGroup=CommandGroup(title="SLP",color=0xb7ffb2)
 hiddenGroup=CommandGroup(hidden=True)
 socialadminGroup=CommandGroup(hidden=True,key=socialkey)
 
-g = git.cmd.Git(gitRepo)
+# g = git.cmd.Git(gitRepo)
 
 
 def links(message,args):
@@ -122,14 +123,14 @@ def listAlias(message,args):
         return message.channel.send("No aliases found.")
 
 async def getCurrentTex(channel, dayOverwrite=None):
-    g.pull()
+    # g.pull()
     dt = datetime.datetime.today()
     day=dt.day
     if dayOverwrite is not None:
         day=dayOverwrite
     idx=(day+2)%30
     number=datemap[idx]
-    sheetFile=sheetTex.replace(sheetPlaceholder,number)
+    # sheetFile=sheetTex.replace(sheetPlaceholder,number)
     if number=="":
         print("Weekend")
     wh,wm=warmupTime
@@ -138,6 +139,7 @@ async def getCurrentTex(channel, dayOverwrite=None):
         print("too early for sheet "+number)
         await channel.send(f"It is too early for the warmup sheet.")
         number=""
+    sheetFile=""
     return sheetFile, number
 
 async def getSheetNumber(message,args):
@@ -151,8 +153,15 @@ async def createWarmupWhiteboard(channel):
     sheetFile,number=await getCurrentTex(channel)
     if number=="":
         return
-    pdf=compileTex(sheetFile)
+    # pdf=compileTex(sheetFile)
+    cached=db.lookupCache(number)
+    if cached is not None:
+        pdf=cached
+    else:
+        pdf=getCurrentPDFFile()
+        db.storeCache(number,pdf)
     boardUrl=db.getBoardUrl(channel.id)
+
     url = uploadWarmup(pdf,boardUrl)
     print(f"Uploaded to {url}")
     await channel.send(f"Here is your warmup {url}")

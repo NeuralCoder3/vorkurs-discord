@@ -4,11 +4,11 @@ import os
 
 try:
     from .util import upload3, pdfToPng, dirOfFile, compileTexIn
-    from .cred import overviewPNG
+    # from .cred import overviewPNG
     from .import database as db
 except ImportError:
     from util import upload3, pdfToPng, dirOfFile, compileTexIn
-    from cred import overviewPNG
+    # from cred import overviewPNG
     import database as db
 
 
