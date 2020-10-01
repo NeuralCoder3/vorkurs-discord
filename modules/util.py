@@ -101,14 +101,23 @@ def compileTexIn(texPath,overviewPath):
 
 def getCurrentPDFFile():
     chrome_options = webdriver.ChromeOptions()
+    chromeBin=os.environ.get("GOOGLE_CHROME_BIN")
+    if chromeBin is not None:
+        chrome_options.binary_location = chromeBin
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--window-size=1420,1080')
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')
+
     prefs = {'download.default_directory' : downDir}
     chrome_options.add_argument("download.default_directory="+downDir)
     chrome_options.add_experimental_option('prefs', prefs)
-    driver = webdriver.Chrome(chrome_options=chrome_options)
+
+    chromedriverPath=os.environ.get("CHROMEDRIVER_PATH")
+    if chromedriverPath is not None:
+        driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+    else:
+        driver = webdriver.Chrome(chrome_options=chrome_options)
 
     driver.get("https://vorkurs.cs.uni-saarland.de/cms/ss20/users/login")
 

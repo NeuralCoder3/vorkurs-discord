@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 import time
 import requests
+import os
 from random import randint
 
 try:
@@ -47,11 +48,18 @@ def addImageUrl(imgUrl,boardId):
     url=getUrl(boardId)
 
     chrome_options = webdriver.ChromeOptions()
+    chromeBin=os.environ.get("GOOGLE_CHROME_BIN")
+    if chromeBin is not None:
+        chrome_options.binary_location = chromeBin
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--window-size=1420,1080')
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')
-    driver = webdriver.Chrome(chrome_options=chrome_options)
+    chromedriverPath=os.environ.get("CHROMEDRIVER_PATH")
+    if chromedriverPath is not None:
+        driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+    else:
+        driver = webdriver.Chrome(chrome_options=chrome_options)
 
     # options = FirefoxOptions()
     # options.headless = True
@@ -81,7 +89,10 @@ def addImageUrl(imgUrl,boardId):
     driver.find_element_by_xpath("//*[@data-autotest-id='modal-window__submit-button']").click()
 
     time.sleep(15)
-    driver.close()
+    try:
+        driver.close()
+    except:
+        pass
 
 
 def uploadWarmup(sheetPdf,boardId):

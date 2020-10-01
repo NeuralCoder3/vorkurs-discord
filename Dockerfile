@@ -1,10 +1,14 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-FROM udsdepend/latex-python:latest
+# FROM udsdepend/latex-python:latest
+# FROM python:3.8-slim-buster 
+# FROM ubuntu
+FROM ubuntu:18.04
 
+RUN apt update
 RUN apt-get install -y git
-RUN apt-get install -y curl
 RUN apt-get install -y python3
-RUN apt update && apt-get install -y python3-pip
+RUN apt-get install -y python3-pip
+RUN apt-get install -y curl
 
 
 # Alternative: use compose with single selenium container
@@ -22,8 +26,9 @@ RUN wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/`cu
 RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
 # RUN apt-get install -y geckodriver
 ENV DISPLAY=:99
-RUN pip install selenium==3.8.0
+RUN python3 -m pip install selenium==3.8.0
 
+# RUN mount -t tmpfs -o rw,nosuid,nodev,noexec,relatime,size=512M tmpfs /dev/shm
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -36,11 +41,11 @@ ADD . /app
 
 # I should not do this
 # the keys are added to the docker container
-RUN mkdir -p /home/appuser/.ssh
-ADD key/id_ed25519 /home/appuser/.ssh/id_rsa
-ADD key/id_ed25519.pub /home/appuser/.ssh/id_rsa.pub
-RUN chmod -R 777 /home/appuser/.ssh
-RUN echo "Host vorkurs.cs.uni-saarland.de\n\tStrictHostKeyChecking no\n" >> /home/appuser/.ssh/config
+# RUN mkdir -p /home/appuser/.ssh
+# ADD key/id_ed25519 /home/appuser/.ssh/id_rsa
+# ADD key/id_ed25519.pub /home/appuser/.ssh/id_rsa.pub
+# RUN chmod -R 777 /home/appuser/.ssh
+# RUN echo "Host vorkurs.cs.uni-saarland.de\n\tStrictHostKeyChecking no\n" >> /home/appuser/.ssh/config
 
 RUN useradd appuser && chown -R appuser /app
 USER appuser
