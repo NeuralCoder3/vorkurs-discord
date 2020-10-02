@@ -55,6 +55,8 @@ def addImageUrl(imgUrl,boardId):
     chrome_options.add_argument('--window-size=1420,1080')
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')
+    # for heroku
+    chrome_options.add_argument('--disable-dev-shm-usage')   
     chromedriverPath=os.environ.get("CHROMEDRIVER_PATH")
     if chromedriverPath is not None:
         driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)

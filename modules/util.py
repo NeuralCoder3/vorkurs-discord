@@ -108,6 +108,8 @@ def getCurrentPDFFile():
     chrome_options.add_argument('--window-size=1420,1080')
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')
+    # for heroku
+    chrome_options.add_argument('--disable-dev-shm-usage')   
 
     prefs = {'download.default_directory' : downDir}
     chrome_options.add_argument("download.default_directory="+downDir)
