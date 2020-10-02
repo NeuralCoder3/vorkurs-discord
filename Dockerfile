@@ -9,6 +9,8 @@ RUN apt-get install -y git
 RUN apt-get install -y python3
 RUN apt-get install -y python3-pip
 RUN apt-get install -y curl
+RUN apt-get install -y imagemagick
+RUN apt-get install -y poppler-utils
 
 
 # Alternative: use compose with single selenium container

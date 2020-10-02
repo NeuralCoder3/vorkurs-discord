@@ -31,7 +31,8 @@ downDir=findPath("/storage/",True)
 # Data
 
 warmupTime=(10,1)
-scheduleTime=(10,1)
+scheduleTime=(10,2)
+hourOff=2
 
 # for weekends
 datemap=[

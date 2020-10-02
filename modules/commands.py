@@ -135,8 +135,8 @@ async def getCurrentNumber(channel, dayOverwrite=None):
         print("Weekend")
     wh,wm=warmupTime
     # print(dt.hour,dt.minute)
-    if (dt.hour<wh) or (dt.hour == wh and dt.minute<wm):
-        print("too early for sheet "+number)
+    if (dt.hour+hourOff<wh) or (dt.hour+hourOff == wh and dt.minute<wm):
+        print("too early for sheet "+number, dt.hour, dt.minute)
         await channel.send(f"It is too early for the warmup sheet.")
         number=""
     sheetFile=""
@@ -175,7 +175,7 @@ async def createWarmupMarkdown(channel):
     await channel.send(f"Here is your markdown warmup {url}")
 
 async def warmUpWhiteboard(message,args):
-    await message.channel.send("Creating whiteboard.")
+    await message.channel.send("Creating whiteboard. I will let you know when I am done.")
     await createWarmupWhiteboard(message.channel)
 
 async def warmUpMarkdown(message,args):
@@ -294,14 +294,14 @@ commands={
     # "listAlias": (listAlias,"Lists all aliases in the channel",discordGroup),
 
     # "ask": (ask,"Asks the questions on the forum. Format /ask 'Title Text': Question, example /ask Was ist das?: Was ist ein Apfel?",warmupGroup),
-    "ask": (askTitle,"Asks the questions on the forum. Format /ask Title",warmupGroup),
-    "subscribeWarmup": (scheduleWarmup,"Subscribe to daily warmup sheets.",warmupGroup),
+    "ask": (askTitle,"Ask a question in the Forum. Format /ask Title",warmupGroup),
+    "subscribeWarmup": (scheduleWarmup,"Subscribe to daily warmup sheets. The daily warm-up sheet is inserted automatically every morning.",warmupGroup),
     # "subscribeWarmupMarkdown": (scheduleWarmupMd,"Subscribe to daily markdown warmup sheets.",warmupGroup),
     "unsubscribe": (unsubscribe,"Removes all subscriptions.",warmupGroup),
     "links": (links,"Prints a list of useful links",warmupGroup),
-    "warmup": (warmUpWhiteboard,"Creates a whiteboard with the current warm-up sheet",warmupGroup),
+    "warmup": (warmUpWhiteboard,"Creates a whiteboard with the current warm-up sheet. Always inserts the current warm-up sheet in the middle of the board.",warmupGroup),
     "getBoard": (claimWhiteboard,"Retrieves the url of the whiteboard for this channel",warmupGroup),
-    "templateMarkdown": (templateMarkdown,"Creates a markdown document with some predefined aliases",warmupGroup),
+    "createMarkdown": (templateMarkdown,"Creates a markdown document",warmupGroup),
 
     "guess": (guess,"Give a guess for the current game. syntax: guess answer",socialGroup),
     "nextGame": (nextGame,"Start next guessing game. syntax: nextGame key name",socialadminGroup),
