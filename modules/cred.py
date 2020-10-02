@@ -26,11 +26,6 @@ database="data.db"
 boardFile="boards.txt"
 aliasFile="defaultAlias.txt"
 downDir=findPath("/storage/",True)
-# gitRepo=findPath("/storage/materials/")
-# overviewPNG=gitRepo+"sheets/warmup/pool/overviewPNG.tex"
-# sheetFolder="sheets/warmup/2020/"
-# sheetPlaceholder="SHEET_ID"
-# sheetTex=gitRepo+sheetFolder+f"warmup_{sheetPlaceholder}.tex"
 
 
 # Data

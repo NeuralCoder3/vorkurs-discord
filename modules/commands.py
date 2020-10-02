@@ -122,7 +122,7 @@ def listAlias(message,args):
     else:
         return message.channel.send("No aliases found.")
 
-async def getCurrentTex(channel, dayOverwrite=None):
+async def getCurrentNumber(channel, dayOverwrite=None):
     # g.pull()
     dt = datetime.datetime.today()
     day=dt.day
@@ -146,11 +146,11 @@ async def getSheetNumber(message,args):
     day=None
     if len(args)>0:
         day=int(args[0])
-    _,num=await getCurrentTex(message.channel,day)
+    _,num=await getCurrentNumber(message.channel,day)
     await message.channel.send(f"The current sheet is {num}")
 
 async def createWarmupWhiteboard(channel):
-    sheetFile,number=await getCurrentTex(channel)
+    sheetFile,number=await getCurrentNumber(channel)
     if number=="":
         return
     # pdf=compileTex(sheetFile)
@@ -308,7 +308,7 @@ commands={
     "showGame": (showGame,"Shows the answers. syntax: showGame key [name]",socialadminGroup),
 
     "subscribeDebug": (scheduleDebug,"Subscribe debugging",hiddenGroup),
-    "claimBoard": (claimWhiteboard,"Claims a whiteboard for the channel",hiddenGroup),
+    # "claimBoard": (claimWhiteboard,"Claims a whiteboard for the channel",hiddenGroup),
     "whichSheet": (getSheetNumber,"Prints the number of the current warmup sheet.",hiddenGroup),
     # "warmupMarkdown": (warmUpMarkdown,"Creates a markdown document with the current warm-up sheet",hiddenGroup),
 }
