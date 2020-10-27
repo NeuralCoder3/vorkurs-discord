@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS claims (
         tryInsertBoards()
         tryInsertAlias()
     except Error as e:
-        print(e)
+        print("DB Error", e)
     return conn
 
 def findBoardListFromId(channelId,cursor):
