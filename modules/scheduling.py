@@ -19,6 +19,7 @@ async def check_schedule():
         for channelId, _, task in tasks:
             channel=client.get_channel(int(channelId))
             if task.lower()=="warmup":
+                print("warmupsheet")
                 await cmd.createWarmupWhiteboard(channel)
             elif task.lower()=="warmupmd":
                 await cmd.createWarmupMarkdown(channel)

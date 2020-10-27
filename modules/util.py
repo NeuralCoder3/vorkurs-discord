@@ -98,8 +98,7 @@ def compileTexIn(texPath,overviewPath):
     os.unlink(tmpPath)
     return pdf
 
-
-def getCurrentPDFFile():
+def getBrowser():
     chrome_options = webdriver.ChromeOptions()
     chromeBin=os.environ.get("GOOGLE_CHROME_BIN")
     if chromeBin is not None:
@@ -121,6 +120,12 @@ def getCurrentPDFFile():
     else:
         driver = webdriver.Chrome(chrome_options=chrome_options)
 
+    return driver
+
+
+def getCurrentPDFFile(number,warmup=True):
+    driver=getBrowser()
+
     driver.get("https://vorkurs.cs.uni-saarland.de/cms/ss20/users/login")
 
     try:
@@ -138,7 +143,10 @@ def getCurrentPDFFile():
 
     driver.get("https://vorkurs.cs.uni-saarland.de/cms/ss20/materials/")
 
-    elem=[(e.text,e.get_attribute("href")) for e in driver.find_elements_by_tag_name("a") if "Warmup" in e.text and "ung" not in e.text]
+    if warmup:
+        elem=[(e.text,e.get_attribute("href")) for e in driver.find_elements_by_tag_name("a") if "Warmup" in e.text and "ung" not in e.text and number.strip() in e.text]
+    else:
+        elem=[(e.text,e.get_attribute("href")) for e in driver.find_elements_by_tag_name("a") if "ungsblatt" in e.text and "vorsch" not in e.text and number.strip() in e.text]
     link=sorted(elem)[-1][1]
     driver.get(link)
     fileName=link.split("/")[-1]
