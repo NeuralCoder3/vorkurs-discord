@@ -55,7 +55,7 @@ def links(message,args):
     embed.add_field(name="Forum", value="[vorkurs-discourse.cs.uni-saarland.de](https://vorkurs-discourse.cs.uni-saarland.de/)")
     embed.add_field(name="General-Whiteboard", value="[miro.com](https://miro.com/app/board/o9J_knFi-8g=/)")
     embed.add_field(name="Markdown-Help", value="[demo.codimd.org](https://demo.codimd.org/VS-PheYmRYudteqkamusjg?both)")
-    embed.add_field(name="Gather.Town", value="[gather.town](https://gather.town/MKvrIqJweh6s7lpZ/CS)")
+    embed.add_field(name="Skript", value="[Vorkurs-Skript](https://vorkurs.cs.uni-saarland.de/cms/ss20/dl/6/Skript.pdf)")
     # embed.add_field(name="Games", value="Ask")
 
     return message.channel.send(embed=embed)
@@ -122,18 +122,29 @@ def listAlias(message,args):
     else:
         return message.channel.send("No aliases found.")
 
-async def getCurrentNumber(channel, dayOverwrite=None):
+def getEffectiveDay(dayOverwrite=None):
     # g.pull()
     dt = datetime.datetime.today()
     day=dt.day
+
+    # day = 5
+
     if dayOverwrite is not None:
         day=dayOverwrite
     idx=(day+2)%30
+
+    return idx
+
+async def getCurrentNumber(channel, dayOverwrite=None, manual=False):
+    idx=getEffectiveDay(dayOverwrite)
+    
     number=datemap[idx]
     # sheetFile=sheetTex.replace(sheetPlaceholder,number)
     if number=="":
         print("Weekend")
+        await channel.send("It is weekend")
     wh,wm=warmupTime
+    dt = datetime.datetime.today()
     # print(dt.hour,dt.minute)
     if (dt.hour+hourOff<wh) or (dt.hour+hourOff == wh and dt.minute<wm):
         print("too early for sheet "+number, dt.hour, dt.minute)
@@ -149,8 +160,9 @@ async def getSheetNumber(message,args):
     _,num=await getCurrentNumber(message.channel,day)
     await message.channel.send(f"The current sheet is {num}")
 
-async def createWarmupWhiteboard(channel):
-    sheetFile,number=await getCurrentNumber(channel)
+async def createWarmupWhiteboard(channel,manual=False):
+    sheetFile,number=await getCurrentNumber(channel,manual=manual)
+    print("Number: ",number)
     if number=="":
         return
     # pdf=compileTex(sheetFile)
@@ -158,13 +170,54 @@ async def createWarmupWhiteboard(channel):
     if cached is not None:
         pdf=cached
     else:
-        pdf=getCurrentPDFFile()
+        pdf=getCurrentPDFFile(number)
         db.storeCache(number,pdf)
-    boardUrl=db.getBoardUrl(channel.id)
+    print("PDF=",pdf)
+    try:
+        boardUrl=db.getBoardUrl(channel.id)
+        print("Medium Url:",boardUrl)
 
-    url = uploadWarmup(pdf,boardUrl)
-    print(f"Uploaded to {url}")
-    await channel.send(f"Here is your warmup {url}")
+        url = uploadWarmup(pdf,boardUrl)
+        print(f"Uploaded to {url}")
+        await channel.send(f"Here is your warmup {url}")
+    except:
+        pass
+
+async def createTutorialWhiteboard(channel,manual=True):
+    # todo: check time
+    idx=getEffectiveDay()
+
+    # idx-=7
+    number=tutorialmap[idx]
+    
+    wh,wm=tutorialTime
+    dt = datetime.datetime.today()
+    if (dt.hour+hourOff<wh) or (dt.hour+hourOff == wh and dt.minute<wm):
+        print("too early for sheet "+number, dt.hour, dt.minute)
+        await channel.send(f"It is too early for the tutorial sheet.")
+        return
+
+    cacheIndex="tutorial_"+number
+    cached=db.lookupCache(cacheIndex)
+
+    print("Num:",number)
+
+    if cached is not None:
+        pdf=cached
+    else:
+        pdf=getCurrentPDFFile(number,warmup=False)
+        db.storeCache(cacheIndex,pdf)
+
+    print("PDF:",pdf)
+    try:
+        boardUrl=db.getBoardUrl(channel.id)
+        print("Medium Url:",boardUrl)
+
+        url = uploadWarmup(pdf,boardUrl,)
+        print(f"Uploaded to {url}")
+        await channel.send(f"Here is your warmup {url}")
+    except:
+        pass
 
 async def createWarmupMarkdown(channel):
     sheetFile,number=await getCurrentTex(channel)
@@ -176,7 +229,11 @@ async def createWarmupMarkdown(channel):
 
 async def warmUpWhiteboard(message,args):
     await message.channel.send("Creating whiteboard. I will let you know when I am done.")
-    await createWarmupWhiteboard(message.channel)
+    await createWarmupWhiteboard(message.channel,manual=True)
+
+async def tutorialWhiteboard(message,args):
+    await message.channel.send("Creating whiteboard. I will let you know when I am done.")
+    await createTutorialWhiteboard(message.channel,manual=True)
 
 async def warmUpMarkdown(message,args):
     await message.channel.send("Creating markdown sheet.")
@@ -290,8 +347,6 @@ commands={
     "remindMe": (remindMe,"Sends a reminder after a specified time to you the user. Syntax: /remindMe time [message], example /remindMe 1m Hi",discordGroup),
     "remindUs": (remindUs,"Sends a reminder after a specified time to this channel. Syntax: /remindUs time [message]",discordGroup),
     "feedback": (feedback,"Send feedback about the bot.",discordGroup),
-    # "alias": (addAlias,"Adds an alias. Syntax: /alias newAlias cmd",discordGroup),
-    # "listAlias": (listAlias,"Lists all aliases in the channel",discordGroup),
 
     # "ask": (ask,"Asks the questions on the forum. Format /ask 'Title Text': Question, example /ask Was ist das?: Was ist ein Apfel?",warmupGroup),
     "ask": (askTitle,"Ask a question in the Forum. Format /ask Title",warmupGroup),
@@ -307,9 +362,12 @@ commands={
     "nextGame": (nextGame,"Start next guessing game. syntax: nextGame key name",socialadminGroup),
     "showGame": (showGame,"Shows the answers. syntax: showGame key [name]",socialadminGroup),
 
+    "tutorial": (tutorialWhiteboard,"Creates a whiteboard with the current tutorial sheet. Always inserts the current sheet in the middle of the board.",hiddenGroup),
     "subscribeDebug": (scheduleDebug,"Subscribe debugging",hiddenGroup),
     # "claimBoard": (claimWhiteboard,"Claims a whiteboard for the channel",hiddenGroup),
     "whichSheet": (getSheetNumber,"Prints the number of the current warmup sheet.",hiddenGroup),
+    "alias": (addAlias,"Adds an alias. Syntax: /alias newAlias cmd",hiddenGroup),
+    "listAlias": (listAlias,"Lists all aliases in the channel",hiddenGroup),
     # "warmupMarkdown": (warmUpMarkdown,"Creates a markdown document with the current warm-up sheet",hiddenGroup),
 }
 

@@ -8,11 +8,11 @@ import os
 from random import randint
 
 try:
-    from .util import upload4, pdfToPng
+    from .util import upload4, pdfToPng, getBrowser
     from .cred import miroUrl, miroOAuth
     from .import database as db
 except ImportError:
-    from util import upload4, pdfToPng
+    from util import upload4, pdfToPng, getBrowser
     from cred import miroUrl, miroOAuth
     import database as db
 
@@ -34,7 +34,7 @@ def createBoard(name):
 def getUrl(boardId):
     return boardId+"?rnd="+str(randint(0,42))
 
-def addPdf(pdf,boardId):
+def addPdf(pdf,boardId,uploadTime):
     cached=db.lookupCache(pdf)
     if cached is not None:
         imgUrl=cached
@@ -42,26 +42,12 @@ def addPdf(pdf,boardId):
         imgPath=pdfToPng(pdf)
         imgUrl=upload4(imgPath)
         db.storeCache(pdf,imgUrl)
-    addImageUrl(imgUrl,boardId)
+    addImageUrl(imgUrl,boardId,uploadTime)
 
-def addImageUrl(imgUrl,boardId):
+def addImageUrl(imgUrl,boardId, uploadTime):
     url=getUrl(boardId)
 
-    chrome_options = webdriver.ChromeOptions()
-    chromeBin=os.environ.get("GOOGLE_CHROME_BIN")
-    if chromeBin is not None:
-        chrome_options.binary_location = chromeBin
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--window-size=1420,1080')
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument('--disable-gpu')
-    # for heroku
-    chrome_options.add_argument('--disable-dev-shm-usage')   
-    chromedriverPath=os.environ.get("CHROMEDRIVER_PATH")
-    if chromedriverPath is not None:
-        driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
-    else:
-        driver = webdriver.Chrome(chrome_options=chrome_options)
+    driver=getBrowser()
 
     # options = FirefoxOptions()
     # options.headless = True
@@ -90,13 +76,13 @@ def addImageUrl(imgUrl,boardId):
     driver.find_element_by_xpath("//*[@data-autotest-id='modal-window__input']").send_keys(imgUrl)
     driver.find_element_by_xpath("//*[@data-autotest-id='modal-window__submit-button']").click()
 
-    time.sleep(15)
+    time.sleep(uploadTime)
     try:
         driver.close()
     except:
         pass
 
 
-def uploadWarmup(sheetPdf,boardId):
-    addPdf(sheetPdf,boardId)
+def uploadWarmup(sheetPdf,boardId,uploadTime=20):
+    addPdf(sheetPdf,boardId,uploadTime)
     return getUrl(boardId)
