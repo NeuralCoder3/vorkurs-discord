@@ -11,7 +11,12 @@ def findPath(p,abs=False):
         else:
             p="."+p
         if not os.path.exists(p):
-            print(f"We have a problem: {p} does not exists.")
+            try:
+                folder=os.path.dirname(p)
+                print("create",folder)
+                os.makedirs(folder)
+            except:
+                pass
     return p
 
 # URLs
@@ -32,7 +37,9 @@ downDir=findPath("/storage/",True)
 
 warmupTime=(10,1)
 scheduleTime=(10,2)
-hourOff=2
+hourOff=0
+
+tutorialTime=(13,50)
 
 # for weekends
 datemap=[
@@ -46,3 +53,18 @@ datemap=[
     "","","","","",
     "","","","",""
 ]
+
+tutorialmap= (
+    # Week 1
+    ["Sprachen"]*2+ 
+    ["Aussagenlogik"]+
+    ["Prädikatenlogik"]*4+  
+    # Week 2 
+    ["Beweisen"]*2+ 
+    ["Textbeweise"]*5+ 
+    # Week 3
+    ["Mengen"]+ 
+    ["Relationen"]*6+ 
+    # Week 4
+    ["Induktion"]*7
+)

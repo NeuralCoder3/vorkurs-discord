@@ -47,8 +47,12 @@ async def on_message(message):
             await message.channel.send(f"invalid command, did you mean {nearest}")
             
 
-database=findPath("/storage/data.db")
+if os.path.exists("/storage/"):
+    database="/storage/data.db"
+else:
+    database=findPath("/storage/data.db")
 
+print("Database:",database)
 db.create_connection(database)
 
 sched.client=client
